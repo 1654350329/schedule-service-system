@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Constants {
-    public static final String TMP_HOME = System.getProperty("java.io.tmpdir");
+    public static final String TMP_HOME = "/temp/";
     //存放抓拍任务id
     public static final Map<String, String> scheduleMap = new ConcurrentHashMap<>();
     //存放归档任务id

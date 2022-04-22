@@ -73,12 +73,13 @@ public class Move extends Base implements Task {
         System.out.println((endTime - startTime));
     }
 
-    public static synchronized void executeCmd(String sourcePath, double time, String outPath, String musicPath) {
+    public static synchronized void executeCmd(String sourcePath, Integer fps, String outPath, String musicPath) {
         System.out.println("开始执行生成视频" + outPath);
         long startTime = System.currentTimeMillis();
-        if (time == 0) {
-            return;
+        if (fps == 0) {
+            fps = 24;
         }
+        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
         List<String> list = new ArrayList<>();
         list.add(Constants.ffmpeg_path);
         list.add("-i");
@@ -91,9 +92,13 @@ public class Move extends Base implements Task {
         list.add("0");
         list.add("-t");
         list.add(time + "");
+        list.add("-vcodec");
+        list.add("libx264");
         list.add("-y");
         list.add(outPath);
         start(list);
+
+
         long endTime = System.currentTimeMillis();
         System.out.println("结束执行生成视频" + outPath);
         System.out.println((endTime - startTime));
@@ -317,8 +322,8 @@ public class Move extends Base implements Task {
             FileUtil.mkdir(Constants.MP4_PATH + taskId);
         }
         log.info("outPutPath = " + outPutPath);
-        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
-        executeCmd(files, time, outPutPath, musicPath);
+
+        executeCmd(files, fps, outPutPath, musicPath);
         //生成点播地址
 //        buildM3u8(outPutPath, Constants.HLS + outputName);
 
@@ -341,9 +346,10 @@ public class Move extends Base implements Task {
         albumRecord.setPreviewImage(previewImage.replace(Constants.Root_PATH, ""));
         File file = new File(outPutPath);
         albumRecord.setFileSize(file.length() / 1024);//以k为单位
+        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
         albumRecord.setDuration(time + "");
         albumRecordService.save(albumRecord);
-        FileUtil.del(files);
+//        FileUtil.del(files);
     }
 
 }

@@ -89,7 +89,7 @@ public class AlbumRecordController {
 
     @GetMapping("/buildVideo/{recordId}")
     @ApiOperation(value = "自定义生成视频")
-    @Log("自定义生成视频")
+//    @Log("自定义生成视频")
     @PreAuthorize("hasAuthority('login:log:list')")
     public RestResponse<Boolean> buildVideo(@PathVariable String recordId) {
         return RestResponse.ok(albumRecordService.buildVideo(recordId));

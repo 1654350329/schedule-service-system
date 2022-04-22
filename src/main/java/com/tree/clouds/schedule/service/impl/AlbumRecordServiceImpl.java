@@ -110,7 +110,7 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
         CompletableFuture.runAsync(new Runnable() {
             @Override
             public void run() {
-                Move.executeCmd(files, time, outPutPath, musicManage.getFilePath());
+                Move.executeCmd(files, buildVideoVO.getFps(), outPutPath, musicManage.getFilePath());
             }
         });
         return albumRecord.getRecordId();
