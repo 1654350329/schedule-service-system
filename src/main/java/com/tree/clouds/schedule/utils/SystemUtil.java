@@ -10,7 +10,7 @@ public class SystemUtil {
     public static String getSystemByName() {
         String osName = System.getProperties().getProperty("os.name");
         System.out.println("osName = " + osName);
-        if (osName.equals("Linux")) {
+        if (osName.equalsIgnoreCase("Linux")) {
             return "linux";
         } else {
             return "other";

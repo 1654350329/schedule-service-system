@@ -23,19 +23,5 @@ public class Info extends Base {
 
     }
 
-    public String size(String sourcePath) {
-        if (!FileUtil.exist(sourcePath)) {
-            return null;
-        }
-        List<String> commands = new ArrayList<>();
-        commands.add(sourcePath);
-        String content = executeFFProbe(commands);
-        try {
-            int i = content.indexOf("Duration: ");
-            return content.substring(i, i + 21).replace("Duration: ", "");
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 }

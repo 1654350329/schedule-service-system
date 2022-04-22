@@ -26,9 +26,9 @@ public class Base {
         execute(command, Constants.ffmpeg_path);
     }
 
-    protected static String executeFFProbe(List<String> command) {
-        return execute(command, Constants.ffprobe_path);
-    }
+//    protected static String executeFFProbe(List<String> command) {
+////        return execute(command, Constants.ffprobe_path);
+//    }
 
     private static String execute(List<String> commands, String exePath) {
         lock.lock();
