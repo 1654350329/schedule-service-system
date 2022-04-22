@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.DeviceScheduleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.DeviceSchedule">
+        <id column="task_id" property="taskId"/>
+        <result column="device_id" property="deviceId"/>
+        <result column="schedule_id" property="scheduleId"/>
+        <result column="DEL" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id, device_id, schedule_id, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, DEL
+    </sql>
+    <select id="getConfigureDetail" resultType="com.tree.clouds.schedule.model.vo.ConfigureDetailVO">
+        select a.channel,a.prefab,b.* from device_schedule a
+        left join device_info b on a.device_id=b.device_id
+        <where>
+            a.schedule_id=#{scheduleId}
+            <if test="ids!=null">
+                and a.device_id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

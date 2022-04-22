@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.OperationLogMapper">
+
+
+    <select id="operationLogPage" resultType="com.tree.clouds.schedule.model.entity.OperationLog">
+        select b.user_name as created_User ,a.* from operation_log a left join user_manage b on a.CREATED_USER=b.user_id
+        where 1=1
+        <if test="operationLogPageVO.userName!=null and operationLogPageVO.userName!=''">
+            and b.user_name like CONCAT('%',#{operationLogPageVO.userName},'%')
+        </if>
+        <if test="operationLogPageVO.ip!=null and operationLogPageVO.ip!=''">
+            and a.ip like CONCAT('%',#{operationLogPageVO.ip},'%')
+        </if>
+        <if test="operationLogPageVO.StartTime!=null and operationLogPageVO.StartTime!=''">
+            and a.created_time >= #{operationLogPageVO.startTime}
+        </if>
+        <if test="operationLogPageVO.endTime!=null and operationLogPageVO.endTime!=''">
+            and a.created_time &lt;= #{operationLogPageVO.endTime}
+        </if>
+    </select>
+
+</mapper>

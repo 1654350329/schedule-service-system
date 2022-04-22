@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.ImageInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.ImageInfo">
+        <id column="image_id" property="imageId"/>
+        <result column="task_id" property="taskId"/>
+        <result column="file_path" property="filePath"/>
+        <result column="preview_path" property="previewPath"/>
+        <result column="year" property="year"/>
+        <result column="month" property="month"/>
+        <result column="day" property="day"/>
+
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="UPDATED_USER" property="updatedUser"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+        <result column="DEL" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        image_id, task_id, file_path, preview_path, year, month, day, CREATED_BY, CREATED_TIME, UPDATED_USER, UPDATED_TIME, DEL
+    </sql>
+    <select id="getAllYear" resultType="java.lang.String">
+        select DISTINCT year from image_info
+        <where>
+            task_id=#{taskId}
+        </where>
+    </select>
+    <select id="getDate" resultType="com.tree.clouds.schedule.model.vo.ImageInfoVO">
+        select DISTINCT a.year,a.month,a.day from image_info a
+        <where>
+            a.task_id=#{taskId}
+        </where>
+    </select>
+    <select id="getDateYear" resultType="java.lang.String">
+        select DISTINCT year from image_info
+        <where>
+            task_id=#{taskId}
+        </where>
+    </select>
+    <select id="getDateMonth" resultType="java.lang.String">
+        select DISTINCT Month from image_info
+        <where>
+            task_id=#{taskId} and year=#{year}
+        </where>
+    </select>
+    <select id="getDateDay" resultType="java.lang.String">
+        select DISTINCT day as label from infoVO
+        <where>
+            task_id=#{taskId} and year=#{year} and month=#{month}
+        </where>
+    </select>
+    <select id="getByDate" resultType="com.tree.clouds.schedule.model.entity.ImageInfo">
+        select * from image_info
+        <where>
+            task_id=#{taskId}
+            <if test="year!=null">
+                and year=#{year}
+            </if>
+            <if test="month!=null">
+                and month=#{month}
+            </if>
+            <if test="day!=null">
+                and day=#{day}
+            </if>
+        </where>
+        order by created_Time
+    </select>
+
+</mapper>

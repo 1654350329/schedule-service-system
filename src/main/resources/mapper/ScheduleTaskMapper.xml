@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.ScheduleTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.ScheduleTask">
+        <id column="schedule_id" property="scheduleId"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="cycle" property="cycle"/>
+        <result column="frequency" property="frequency"/>
+        <result column="code_rate" property="codeRate"/>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        schedule_id, start_time, end_time, cycle, frequency, code_rate, CREATED_BY, CREATED_TIME, UPDATED_BY, UPDATED_TIME, DEL
+    </sql>
+    <select id="schedulePage" resultType="com.tree.clouds.schedule.model.bo.ScheduleTaskBO">
+        select DISTINCT a.*,b.file_name from schedule_task a
+        left join music_manage b on a.music_id=b.music_id
+        left join device_schedule c on a.schedule_id=c.schedule_id
+        <where>
+            <if test="scheduleTaskPageVO.scheduleName!=null and scheduleTaskPageVO.scheduleName!=''">
+                and a.schedule_name like "%"#{scheduleTaskPageVO.scheduleName}"%"
+            </if>
+            <if test="scheduleTaskPageVO.startDate!=null and scheduleTaskPageVO.startDate!=''">
+                and a.start_Date &lt;= #{scheduleTaskPageVO.startDate}
+            </if>
+            <if test="scheduleTaskPageVO.endDate!=null and scheduleTaskPageVO.endDate!=''">
+                and a.end_Date >= #{scheduleTaskPageVO.endDate}
+            </if>
+            <if test="scheduleTaskPageVO.scheduleStatus!=null and scheduleTaskPageVO.scheduleStatus!=''">
+                and a.schedule_Status=#{scheduleTaskPageVO.scheduleStatus}
+            </if>
+
+            <if test="scheduleTaskPageVO.startTime!=null and scheduleTaskPageVO.startTime!=''">
+                and a.start_time=#{scheduleTaskPageVO.startTime}
+            </if>
+            <if test="scheduleTaskPageVO.endTime!=null and scheduleTaskPageVO.endTime!=''">
+                and a.end_time=#{scheduleTaskPageVO.endTime}
+            </if>
+
+            <if test="scheduleTaskPageVO.cycle!=null">
+                and a.cycle=#{scheduleTaskPageVO.cycle}
+            </if>
+            <if test="scheduleTaskPageVO.deviceId!=null and scheduleTaskPageVO.deviceId!=''">
+                and c.device_Id=#{scheduleTaskPageVO.deviceId}
+            </if>
+        </where>
+        order by CREATED_TIME desc
+    </select>
+
+</mapper>

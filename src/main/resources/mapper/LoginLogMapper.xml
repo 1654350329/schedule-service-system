@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.LoginLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.LoginLog">
+        <id column="login_id" property="loginId"/>
+        <result column="account" property="account"/>
+        <result column="ip" property="ip"/>
+        <result column="status" property="status"/>
+        <result column="long_time" property="longTime"/>
+        <result column="error_sort" property="errorSort"/>
+        <result column="error_info" property="errorInfo"/>
+        <result column="CREATED_USER" property="createdUser"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="UPDATED_USER" property="updatedUser"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+        <result column="del" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        login_id, account, ip, status, long_time, error_sort, error_info, CREATED_USER, CREATED_TIME, UPDATED_USER, UPDATED_TIME, del
+    </sql>
+
+</mapper>

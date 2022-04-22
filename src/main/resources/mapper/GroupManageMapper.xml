@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.GroupManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.GroupManage">
+        <id column="GROUP_ID" property="groupId"/>
+        <result column="GROUP_NAME" property="groupName"/>
+        <result column="CREATED_USER" property="createdUser"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="UPDATED_USER" property="updatedUser"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+        <result column="DEL" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        GROUP_ID, GROUP_NAME, CREATED_USER, CREATED_TIME, UPDATED_USER, UPDATED_TIME, DEL
+    </sql>
+    <select id="groupManagePage" resultType="com.tree.clouds.schedule.model.entity.GroupManage">
+        select * from group_manage where 1=1
+        <if test="groupManagePageVO.groupName !=null and groupManagePageVO.groupName !=''">
+            and GROUP_NAME like "%"#{groupManagePageVO.groupName}"%"
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.RoleUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.RoleUser">
+        <result column="ROLE_ID" property="roleId"/>
+        <result column="USER_ID" property="userId"/>
+        <result column="CREATED_USER" property="createdUser"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="UPDATED_USER" property="updatedUser"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+        <result column="DEL" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ROLE_ID, USER_ID, CREATED_USER, CREATED_TIME, UPDATED_USER, UPDATED_TIME, DEL
+    </sql>
+    <select id="getUserInfoByRole" resultType="com.tree.clouds.schedule.model.entity.UserManage">
+        select b.* from role_user a
+        left join user_manage b on a.user_id = b.user_id
+        left join role_manage c on a.role_id = c.role_id
+        where c.role_name=#{roleName}
+    </select>
+    <select id="getRoleByUserId" resultType="com.tree.clouds.schedule.model.entity.RoleManage">
+        select a.* from role_manage a
+        left join role_user c on a.role_id = c.role_id
+        where c.user_id=#{userId}
+    </select>
+
+</mapper>

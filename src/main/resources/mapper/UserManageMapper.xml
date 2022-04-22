@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.UserManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.UserManage">
+        <result column="USER_ID" property="userId"/>
+        <result column="USER_NAME" property="userName"/>
+        <result column="PHONE_NUMBER" property="phoneNumber"/>
+
+
+        <result column="ACCOUNT_STATUS" property="accountStatus"/>
+        <result column="REMARK" property="remark"/>
+        <result column="CREATED_USER" property="createdUser"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="UPDATED_USER" property="updatedUser"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+        <result column="DEL" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        USER_ID, USER_NAME, PHONE_NUMBER, UNIT, SEX, JOB, TITLE_GRADE, ACCOUNT, PASSWORD, WECHAT_AUTHORIZATION, RECEIVE_NOTICE_STATUS, ACCOUNT_STATUS, REMARK, CREATED_USER, CREATED_TIME, UPDATED_USER, UPDATED_TIME, DEL
+    </sql>
+    <select id="userManagePage" resultType="com.tree.clouds.schedule.model.bo.UserManageBO">
+        select a.user_name as createdUser, a.*,b.group_id from user_manage a
+        left join group_user b on a.user_id=b.user_id
+        <if test="userManagePageVO.roleName != null and userManagePageVO.roleName != ''">
+            left join role_user c on a.user_id=c.user_id
+            left join role_manage d on c.role_id=d.role_id
+        </if>
+        where 1=1 and a.del=0
+        <if test="userManagePageVO.groupId != null and userManagePageVO.groupId != ''">
+            and b.group_id =#{userManagePageVO.groupId}
+        </if>
+        <if test="userManagePageVO.account != null and userManagePageVO.account != ''">
+            and a.account like "%"#{userManagePageVO.account}"%"
+        </if>
+        <if test="userManagePageVO.userName != null and userManagePageVO.userName != ''">
+            and a.user_name like "%"#{userManagePageVO.userName}"%"
+        </if>
+        <if test="userManagePageVO.roleName != null and userManagePageVO.roleName != ''">
+            and d.role_name like "%"#{userManagePageVO.roleName}"%"
+        </if>
+
+    </select>
+    <select id="listByMenuId" resultType="com.tree.clouds.schedule.model.entity.UserManage">
+        select DISTINCT a.* from user_manage a
+            LEFT JOIN role_user  b on a.USER_ID=b.USER_ID
+            LEFT JOIN sys_role_menu c on b.ROLE_ID=c.role_id
+            where c.menu_id=#{menuId}
+    </select>
+    <select id="isExist" resultType="com.tree.clouds.schedule.model.entity.UserManage">
+        select * from user_manage where account=#{account} or PHONE_NUMBER=#{phone}
+    </select>
+    <select id="listByRoleId" resultType="com.tree.clouds.schedule.model.entity.UserManage">
+         select DISTINCT a.* from user_manage a
+            LEFT JOIN role_user  b on a.USER_ID=b.USER_ID
+            where b.role_id=#{roleId}
+    </select>
+
+</mapper>
