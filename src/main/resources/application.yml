@@ -38,10 +38,10 @@ spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/schedule_service?useUnicode=true&useSSL=true&useUnicode=true&characterEncoding=UTF-8
-    #    username: schedule_service
-    #    password: root
-    username: root
-    password: 123456
+    username: schedule_service
+    password: root
+#    username: root
+#    password: 123456
 
 
 
