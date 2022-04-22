@@ -1,0 +1,65 @@
+server:
+  port: 8082
+  maxHttpHeaderSize: 102400
+  #  servlet:
+  #    context-path: /schedule
+  error:
+    include-exception: true
+    include-message: always
+  undertow:
+    max-http-post-size: -1
+spring:
+  application:
+    name: schedule-server
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+  ##选用缓存类型
+  redis:
+    host: 127.0.0.1
+    #    password:
+    port: 6379
+    database: 5
+  cache:
+    type: redis  #ehcache
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/schedule_service?useUnicode=true&useSSL=true
+    #    username: schedule_service
+    username: root
+    password: root
+
+
+
+
+# mybatis-plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:mapper/*Mapper.xml
+
+
+markerhub:
+  jwt:
+    header: Authorization
+    expire: 604800 #7天，秒单位
+    secret: ji8n3439n439n43ld9ne9343fdfer49h
+
+qiniu:
+  accessKey: BGUpQznLLmK0W230OZBiAoaCuavRh-7OYSnLFdtT
+  secretKey: x_OuqdffUQwKLDM0bhOJIA6Mv9Ac37qFe1g21ywb
+  bucket: xpwgh
+  fontUrl: https://xpwghoss.3dy.me/
+
+sms:
+  account: 123162
+  password: naKfTX
+  extno: 10690371
+  url: http://47.99.242.143:7862/sms

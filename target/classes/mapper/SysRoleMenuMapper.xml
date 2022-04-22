@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.SysRoleMenuMapper">
+
+    <select id="getNavMenuIds" resultType="java.lang.String">
+       SELECT DISTINCT c.menu_id from user_manage a
+            LEFT JOIN role_user  b on a.USER_ID=b.USER_ID
+            LEFT JOIN sys_role_menu c on b.ROLE_ID=c.role_id
+            where a.user_id=#{userId}
+    </select>
+</mapper>

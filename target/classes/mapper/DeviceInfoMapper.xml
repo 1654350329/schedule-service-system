@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tree.clouds.schedule.mapper.DeviceInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tree.clouds.schedule.model.entity.DeviceInfo">
+        <result column="device_id" property="deviceId"/>
+        <result column="device_address" property="deviceAddress"/>
+        <result column="device_account" property="deviceAccount"/>
+        <result column="device_password" property="devicePassword"/>
+        <result column="DEL" property="del"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+
+    <select id="deviceInfoPage" resultType="com.tree.clouds.schedule.model.entity.DeviceInfo">
+        select a.* from device_info a
+        left join device_schedule b on a.device_id=b.device_id
+        <where>
+            <if test="deviceInfoPageVO.deviceName!=null and deviceInfoPageVO.deviceName!=''">
+                and a.device_Name like "%"#{deviceInfoPageVO.deviceName}"%"
+            </if>
+            <if test="deviceInfoPageVO.address!=null and deviceInfoPageVO.address!=''">
+                and a.address like CONCAT('%',#{deviceInfoPageVO.address},'%')
+            </if>
+            <if test="deviceInfoPageVO.deviceAccount!=null and deviceInfoPageVO.deviceAccount!=''">
+                and a.device_account like CONCAT('%',#{deviceInfoPageVO.deviceAccount},'%')
+            </if>
+            <if test="deviceInfoPageVO.deviceType!=null">
+                and a.device_type = #{deviceInfoPageVO.deviceType}
+            </if>
+            <if test="deviceInfoPageVO.scheduleId !=null and deviceInfoPageVO.scheduleId !=''">
+                and b.schedule_Id=#{deviceInfoPageVO.scheduleId}
+            </if>
+        </where>
+        order by CREATED_TIME desc
+    </select>
+    <select id="getTypeNumber" resultType="java.lang.Integer">
+        select count(*) from device_info where device_type=#{type} and CREATED_USER=#{userId}
+    </select>
+
+</mapper>

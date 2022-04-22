@@ -146,7 +146,7 @@ public class Move extends Base implements Task {
      * @param filePaths
      * @return
      */
-    public static String copyListFiles(List<String> filePaths) {
+    public static synchronized String copyListFiles(List<String> filePaths) {
         List<File> files = getListFiles(filePaths);
         String uuid = UUID.fastUUID().toString();
         String filePath = Constants.TMP_HOME + uuid;

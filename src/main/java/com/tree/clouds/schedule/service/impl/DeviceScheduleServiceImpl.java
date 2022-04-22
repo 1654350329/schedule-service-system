@@ -175,7 +175,7 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
     @Override
     public DeviceSchedule getByScheduleIdAndDeviceId(String scheduleId, String deviceId) {
         return this.getOne(new QueryWrapper<DeviceSchedule>().eq(DeviceSchedule.SCHEDULE_ID, scheduleId)
-                .eq(DeviceSchedule.DEVICE_ID, deviceId));
+                .eq(DeviceSchedule.DEVICE_ID, deviceId).orderByAsc(DeviceSchedule.CREATED_TIME));
     }
 
     @Override
