@@ -116,7 +116,7 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         TestHikvision testHikvision = new TestHikvision(cameraInfo, DateUtil.formatDateTime(new Date(time + 1000 * 60 * 60)), deviceLogService, imageInfoService);
         if (task.getTaskType() == 2) {
             //自定义时间 需指定任务结束日期
-            testHikvision = new TestHikvision(cameraInfo, task.getEndDate() + " 23:59:59", deviceLogService, imageInfoService);
+            testHikvision = new TestHikvision(cameraInfo, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
             CronUtil.remove(task.getScheduleNumber());
         }
         String schedule = CronUtil.schedule(scheduleCycle, testHikvision);

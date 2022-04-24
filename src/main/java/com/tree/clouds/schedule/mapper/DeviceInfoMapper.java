@@ -15,7 +15,7 @@ import com.tree.clouds.schedule.model.vo.DeviceInfoPageVO;
  */
 public interface DeviceInfoMapper extends BaseMapper<DeviceInfo> {
 
-    IPage<DeviceInfo> deviceInfoPage(IPage<DeviceInfo> page, DeviceInfoPageVO deviceInfoPageVO);
+    IPage<DeviceInfo> deviceInfoPage(IPage<DeviceInfo> page, DeviceInfoPageVO deviceInfoPageVO, String userId);
 
     int getTypeNumber(int type, String userId);
 }

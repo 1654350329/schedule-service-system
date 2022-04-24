@@ -134,4 +134,14 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
         return this.count(wrapper);
     }
 
+    @Override
+    public Boolean removeVideo(List<String> ids) {
+        for (String id : ids) {
+            AlbumRecord albumRecord = this.getById(id);
+            FileUtil.del(albumRecord.getFilePath());
+            this.removeById(id);
+        }
+        return true;
+    }
+
 }

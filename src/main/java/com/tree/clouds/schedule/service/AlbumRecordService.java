@@ -36,4 +36,5 @@ public interface AlbumRecordService extends IService<AlbumRecord> {
 
     int getRecordSum(String taskId);
 
+    Boolean removeVideo(List<String> ids);
 }
