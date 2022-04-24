@@ -25,6 +25,7 @@
                 and file_Name like "%"#{albumRecordPageVO.fileName}"%"
             </if>
         </where>
+        order by CREATED_TIME desc
     </select>
 
 </mapper>
