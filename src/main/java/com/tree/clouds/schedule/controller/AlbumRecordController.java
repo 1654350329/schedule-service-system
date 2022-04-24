@@ -34,6 +34,7 @@ public class AlbumRecordController {
     @Autowired
     private ImageInfoService imageInfoService;
 
+
     @PostMapping("/albumRecordPage")
     @ApiOperation(value = "相册记录分页查询")
     @Log("相册记录分页查询")
@@ -87,12 +88,24 @@ public class AlbumRecordController {
         return RestResponse.ok(taskId);
     }
 
-    @GetMapping("/buildVideo/{recordId}")
-    @ApiOperation(value = "自定义生成视频")
+    @PostMapping("/getProgress/{recordId}")
+    @ApiOperation(value = "自定义生成视频进度条")
+    @PreAuthorize("hasAuthority('login:log:list')")
+    public void getProgress(@PathVariable String recordId) {
+//        for (int i = 0; i < 100; i++) {
+//            MsgDTO msgDTO = new MsgDTO();
+//            msgDTO.setReceiverId(recordId);
+//            msgDTO.setMsgBody("成功发送"+i);
+//            WebSocketSupport.tryPush(msgDTO);
+//        }
+    }
+
+    @PostMapping("/removeVideo")
+    @ApiOperation(value = "删除视频")
 //    @Log("自定义生成视频")
     @PreAuthorize("hasAuthority('login:log:list')")
-    public RestResponse<Boolean> buildVideo(@PathVariable String recordId) {
-        return RestResponse.ok(albumRecordService.buildVideo(recordId));
+    public RestResponse<Boolean> removeVideo(@RequestBody PublicIdsReqVO publicIdsReqVO) {
+        return RestResponse.ok(albumRecordService.removeVideo(publicIdsReqVO.getIds()));
     }
 
 

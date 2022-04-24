@@ -54,7 +54,7 @@ public class DeviceInfoServiceImpl extends ServiceImpl<DeviceInfoMapper, DeviceI
     @Override
     public IPage<DeviceInfo> deviceInfoPage(DeviceInfoPageVO deviceInfoPageVO) {
         IPage<DeviceInfo> page = deviceInfoPageVO.getPage();
-        page = this.baseMapper.deviceInfoPage(page, deviceInfoPageVO);
+        page = this.baseMapper.deviceInfoPage(page, deviceInfoPageVO, LoginUserUtil.getUserId());
         if (deviceInfoPageVO.getScheduleId() != null) {
             for (DeviceInfo record : page.getRecords()) {
                 DeviceSchedule deviceSchedule = this.deviceScheduleService.getByScheduleIdAndDeviceId(deviceInfoPageVO.getScheduleId(), record.getDeviceId());

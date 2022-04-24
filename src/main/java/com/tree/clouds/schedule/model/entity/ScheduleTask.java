@@ -53,11 +53,11 @@ public class ScheduleTask extends BaseEntity {
 
     @ApiModelProperty(value = "每日执行开始时间 格式 时 ", example = "06")
     @TableField("start_time")
-    private Integer startTime;
+    private String startTime;
 
     @ApiModelProperty(value = "每日执行结束时间 格式 时", example = "08")
     @TableField("end_time")
-    private Integer endTime;
+    private String endTime;
 
     @ApiModelProperty(value = "执行结束日期", example = "2023-04-01")
     @TableField("end_date")

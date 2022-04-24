@@ -15,8 +15,11 @@
 
     <select id="deviceInfoPage" resultType="com.tree.clouds.schedule.model.entity.DeviceInfo">
         select a.* from device_info a
-        left join device_schedule b on a.device_id=b.device_id
+        left join device_schedule b on a.device_id=b.device_id and a.del=0
         <where>
+            <if test="userId!=null">
+                and a.CREATED_USER=#{userId}
+            </if>
             <if test="deviceInfoPageVO.deviceName!=null and deviceInfoPageVO.deviceName!=''">
                 and a.device_Name like "%"#{deviceInfoPageVO.deviceName}"%"
             </if>
