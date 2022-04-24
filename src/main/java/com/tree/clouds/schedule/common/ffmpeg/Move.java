@@ -16,10 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class Move extends Base implements Task {
@@ -131,18 +129,53 @@ public class Move extends Base implements Task {
         return files;
     }
 
+    public static File[] orderByDate(String filePath) {
+        File file = new File(filePath);
+        File[] files = file.listFiles();
+        Arrays.sort(files, new Comparator<File>() {
+            public int compare(File f1, File f2) {
+                long diff = f1.lastModified() - f2.lastModified();
+                if (diff > 0)
+                    return -1;
+                else if (diff == 0)
+                    return 0;
+                else
+                    return 1;//如果 if 中修改为 返回-1 同时此处修改为返回 1  排序就会是递减,如果 if 中修改为 返回1 同时此处修改为返回 -1  排序就会是递增,
+            }
+
+            public boolean equals(Object obj) {
+                return true;
+            }
+
+        });
+        return files;
+
+    }
+
+
     /***
      * 获取指定目录下的所有的文件（不包括文件夹），采用了递归
      *
      * @param filePaths
      * @return
      */
-    public static ArrayList<File> getListFiles(List<String> filePaths) {
+    public static List<File> getListFiles(List<String> filePaths) {
         ArrayList<File> files = new ArrayList<>();
         for (String filePath : filePaths) {
             files.addAll(getListFiles(filePath));
         }
-        return files;
+        return files.stream().sorted(new Comparator<File>() {
+            @Override
+            public int compare(File f1, File f2) {
+                long diff = f1.lastModified() - f2.lastModified();
+                if (diff > 0)
+                    return 1;
+                else if (diff == 0)
+                    return 0;
+                else
+                    return -1;//如果 if 中修改为 返回-1 同时此处修改为返回 1  排序就会是递减,如果 if 中修改为 返回1 同时此处修改为返回 -1  排序就会是递增,
+            }
+        }).collect(Collectors.toList());
     }
 
     /**
