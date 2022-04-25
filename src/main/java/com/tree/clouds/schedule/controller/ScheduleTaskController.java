@@ -113,7 +113,13 @@ public class ScheduleTaskController {
                 throw new BaseBusinessException(400, "请先添加设备!");
             }
             ScheduleTask scheduleTask = this.scheduleTaskService.getById(id);
-            String dateTime = scheduleTask.getEndDate() + " " + scheduleTask.getEndTime() + ":59:59";
+            if (scheduleTask.getTaskType() == 1) {
+                scheduleTask.setEndTime("08:00:00");
+            }
+            if (scheduleTask.getTaskType() == 2) {
+                scheduleTask.setEndTime("19:30:00");
+            }
+            String dateTime = scheduleTask.getEndDate() + " " + scheduleTask.getEndTime();
             if (new Date().getTime() > DateUtil.parseDateTime(dateTime).getTime()) {
                 throw new BaseBusinessException(400, "执行任务时间已结束!请重新编辑");
             }

@@ -112,8 +112,14 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         cameraInfo.setPath(deviceInfo.getAddress() + "__周期:" + scheduleCycle);
         cameraInfo.setDeviceId(deviceInfo.getDeviceId());
         cameraInfo.setCreatUser(task.getCreatedUser());
-        //抓拍半小时
-        TestHikvision testHikvision = new TestHikvision(cameraInfo, DateUtil.formatDateTime(new Date(time + 1000 * 60 * 60)), deviceLogService, imageInfoService);
+        //抓拍1小时
+        TestHikvision testHikvision = null;
+        if (task.getTaskType() == 0) {
+            testHikvision = new TestHikvision(cameraInfo, DateUtil.formatDateTime(new Date(time + 1000 * 60 * 20)), deviceLogService, imageInfoService);
+        }
+        if (task.getTaskType() == 1) {
+            testHikvision = new TestHikvision(cameraInfo, DateUtil.formatDateTime(new Date(time + 1000 * 60 * 40)), deviceLogService, imageInfoService);
+        }
         if (task.getTaskType() == 2) {
             //自定义时间 需指定任务结束日期
             testHikvision = new TestHikvision(cameraInfo, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);

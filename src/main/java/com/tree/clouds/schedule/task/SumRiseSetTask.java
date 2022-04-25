@@ -39,13 +39,14 @@ public class SumRiseSetTask implements Task {
             if (scheduleTask.getTaskType() == 1) {
                 startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
             }
-            if (scheduleTask.getTaskType() == 1) {
+            if (scheduleTask.getTaskType() == 2) {
                 startTime = scheduleTask.getStartTime();
             }
-            if (scheduleTask.getTaskType() == 0 || scheduleTask.getTaskType() == 1) {
+
+            if (scheduleTask.getTaskType() == 0) {
                 DateTime parse = DateUtil.parse(startTime, "HH:mm:ss");
                 //日出落前半小时
-                startTime = DateUtil.format(new Date(parse.getTime() - (1000 * 60 * 30)), "HH:mm:ss");
+                startTime = DateUtil.format(new Date(parse.getTime() - (1000 * 60 * 40)), "HH:mm:ss");
                 startTime = (DateUtil.formatDate(new Date()) + " " + startTime);
                 DateTime dateTime = DateUtil.parse(startTime, "yyyy-MM-dd HH:mm:ss");
                 try {
@@ -58,7 +59,23 @@ public class SumRiseSetTask implements Task {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } else {
+            } else if (scheduleTask.getTaskType() == 1) {
+                DateTime parse = DateUtil.parse(startTime, "HH:mm:ss");
+                //日出落前半小时
+                startTime = DateUtil.format(new Date(parse.getTime() - (1000 * 60 * 20)), "HH:mm:ss");
+                startTime = (DateUtil.formatDate(new Date()) + " " + startTime);
+                DateTime dateTime = DateUtil.parse(startTime, "yyyy-MM-dd HH:mm:ss");
+                try {
+                    String scheduleCycle = String.format("*/%s * * * * ? *", scheduleTask.getFrequency());
+                    while (new Date().getTime() < dateTime.getTime()) {
+                        System.out.println(" 等等执行" + deviceInfo);
+                        Thread.currentThread().sleep(1000 * 30);
+                    }
+                    deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, dateTime.getTime());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else if (scheduleTask.getTaskType() == 2) {
                 String scheduleCycle = null;
                 String[] split = scheduleTask.getStartTime().split(":");
                 if (scheduleTask.getFrequencyUnit() == 0) {

@@ -151,12 +151,12 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
         if (scheduleTask.getTaskType() == 0) {
             //执行时间
             String date = scheduleTask.getStartDate();
-            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 05:09:00");
+            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 04:30:00");
             if (parseDate.getTime() <= new Date().getTime()) {
                 date = DateUtil.formatDate(new Date());
             }
             String[] dates = date.split("-");
-            String schedulingPattern = String.format("0 10 5 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
+            String schedulingPattern = String.format("0 40 4 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
             SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
             schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
             log.info("日出计划schedulingPattern = " + schedulingPattern);
