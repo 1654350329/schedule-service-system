@@ -189,41 +189,6 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
             schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
             log.info("自定义计划schedulingPattern = " + schedulingPattern);
-//            //首次执行时间
-//            String schedulingPattern;
-//            String date = scheduleTask.getStartDate();
-//            DateTime parse = DateUtil.parse(date + " " + scheduleTask.getStartTime() + ":00:00", "yyyy-MM-dd HH:mm:ss");
-//            if (parse.getTime() <= new Date().getTime()) {
-//                oldTime = scheduleTask.getStartTime();
-//                startTime = DateUtil.formatTime(new Date(new Date().getTime() + 10000));
-//                date = DateUtil.formatDate(new Date());
-//            } else {
-//                startTime = scheduleTask.getStartTime() + ":00:00";
-//            }
-//            String[] dates = date.split("-");
-//            String[] times = startTime.split(":");
-//            //首次执行时间
-//            schedulingPattern = String.format("%s %s %s %s %s ? *", times[2], times[1], times[0], dates[2], dates[1]);
-//            if (oldTime != null) {
-//                times[0] = String.valueOf(oldTime);
-//            }
-//            String scheduleCycle = null;
-//
-//            if (scheduleTask.getFrequencyUnit() == 0) {
-//                scheduleCycle = String.format("*/%s * %s-%s * * ? *", scheduleTask.getFrequency(), times[0], scheduleTask.getEndTime());
-//            }
-//            if (scheduleTask.getFrequencyUnit() == 1) {
-//                scheduleCycle = String.format("0 */%s %s-%s * * ? *", scheduleTask.getFrequency(), times[0], scheduleTask.getEndTime());
-//            }
-//            if (scheduleTask.getFrequencyUnit() == 2) {
-//                scheduleCycle = String.format("0 0 %s-%s/%s * * ? *", scheduleTask.getFrequency(), times[0], scheduleTask.getEndTime());
-//            }
-//
-//            System.out.println("schedulingPattern = " + schedulingPattern);
-//            System.out.println("scheduleCycle = " + scheduleCycle);
-//            TaskSchedule taskSchedule = new TaskSchedule(scheduleCycle, scheduleTask, this.deviceScheduleService);
-//            String schedule = CronUtil.schedule(schedulingPattern, taskSchedule);
-//            scheduleTask.setScheduleNumber(schedule);
         }
 
         if (!CronUtil.getScheduler().isStarted()) {

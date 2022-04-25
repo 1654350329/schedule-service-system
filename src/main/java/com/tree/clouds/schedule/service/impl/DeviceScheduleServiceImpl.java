@@ -126,13 +126,13 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
             CronUtil.remove(task.getScheduleNumber());
         }
         String schedule = CronUtil.schedule(scheduleCycle, testHikvision);
-        if (task.getTaskType() == 0 || task.getTaskType() == 1) {
-            String date = task.getEndDate();
-            DateTime parse = DateUtil.parse(date, "yyyy-MM-dd");
-            if (parse.getTime() > new Date().getTime()) {
-                CronUtil.remove(task.getScheduleNumber());
-            }
+        //判断是否到结束日期 结束移除任务
+        String date = task.getEndDate();
+        DateTime parse = DateUtil.parse(date, "yyyy-MM-dd");
+        if (parse.getTime() > new Date().getTime()) {
+            CronUtil.remove(task.getScheduleNumber());
         }
+
         //存放任务队列信息
         Constants.scheduleMap.put(deviceSchedule.getTaskId(), schedule);
 
