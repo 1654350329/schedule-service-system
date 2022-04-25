@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -69,7 +70,13 @@ public class DeviceInfoServiceImpl extends ServiceImpl<DeviceInfoMapper, DeviceI
     @Override
     public Boolean deleteDevice(List<String> ids) {
         deviceScheduleService.remove(new QueryWrapper<DeviceSchedule>().in(DeviceSchedule.DEVICE_ID, ids));
-        return this.removeByIds(ids);
+        List<DeviceInfo> collect = ids.stream().map(id -> {
+            DeviceInfo deviceInfo = new DeviceInfo();
+            deviceInfo.setDeviceId(id);
+            deviceInfo.setDel(1);
+            return deviceInfo;
+        }).collect(Collectors.toList());
+        return this.removeByIds(collect);
     }
 
     @Override

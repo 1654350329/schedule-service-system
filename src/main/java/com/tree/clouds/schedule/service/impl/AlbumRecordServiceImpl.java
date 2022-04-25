@@ -92,6 +92,7 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
         albumRecord.setPlayPeriod(null);
         albumRecord.setFilePath(outPutPath);
         albumRecord.setFileName(outputName + ".mp4");
+        albumRecord.setDel(1);
 //        albumRecord.setFileAddress(Constants.HLS + outputName);
         //取文件夹第一张图片为封面
         String previewImage = Constants.PREVIEW_PATH + service.getTaskId() + File.separator + outputName + "_pre.jpg";
@@ -111,6 +112,10 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
             @Override
             public void run() {
                 Move.executeCmd(files, buildVideoVO.getFps(), outPutPath, musicManage.getFilePath());
+                AlbumRecord al = new AlbumRecord();
+                al.setRecordId(albumRecord.getTaskId());
+                al.setDel(0);
+                updateById(al);
             }
         });
         return albumRecord.getRecordId();

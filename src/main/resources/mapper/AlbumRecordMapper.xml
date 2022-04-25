@@ -20,7 +20,7 @@
     <select id="albumRecordPage" resultType="com.tree.clouds.schedule.model.entity.AlbumRecord">
         select * from album_record
         <where>
-            task_id=#{taskId}
+            task_id=#{taskId} and del=0
             <if test="albumRecordPageVO.fileName !=null and albumRecordPageVO.fileName!=''">
                 and file_Name like "%"#{albumRecordPageVO.fileName}"%"
             </if>
