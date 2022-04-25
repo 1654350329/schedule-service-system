@@ -10,7 +10,6 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.tree.clouds.schedule.common.Constants;
-import com.tree.clouds.schedule.common.hkws.windows.HCNetSDK;
 import com.tree.clouds.schedule.model.entity.ImageInfo;
 import com.tree.clouds.schedule.service.DeviceLogService;
 import com.tree.clouds.schedule.service.ImageInfoService;
@@ -53,7 +52,7 @@ public class TestHikvision implements Task {
             long startTime = System.currentTimeMillis();
             log.info("cameraInfo = " + cameraInfo);
             if (!hcNetSDKMap.containsKey(cameraInfo.getDeviceId())) {
-                com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_DEVICEINFO_V30 devinfo = new com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_DEVICEINFO_V30();// 设备信息
+                HCNetSDK.NET_DVR_DEVICEINFO_V30 devinfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();// 设备信息
                 //注册设备
                 NativeLong id = sdk.NET_DVR_Login_V30(cameraInfo.getCameraIp(), (short) cameraInfo.getCameraPort(),
                         cameraInfo.getUserName(), cameraInfo.getUserPwd(), devinfo);
@@ -75,18 +74,18 @@ public class TestHikvision implements Task {
             cameraInfo.setUserId(hcNetSDKMap.get(cameraInfo.getDeviceId()));
             if (cameraInfo.getDwPresetIndex() != null && cameraInfo.getDwPresetIndex() != 0) {
                 //跳转到预置点
-                com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_CLIENTINFO clientinfo = new com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_CLIENTINFO();
+                HCNetSDK.NET_DVR_CLIENTINFO clientinfo = new HCNetSDK.NET_DVR_CLIENTINFO();
                 clientinfo.lChannel = cameraInfo.getChannel();
                 clientinfo.hPlayWnd = null;
 
                 NativeLong nativeLong = sdk.NET_DVR_RealPlay(cameraInfo.getUserId(),
                         clientinfo);
-                sdk.NET_DVR_PTZPreset(nativeLong, com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.GOTO_PRESET, cameraInfo.getDwPresetIndex());
+                sdk.NET_DVR_PTZPreset(nativeLong, HCNetSDK.GOTO_PRESET, cameraInfo.getDwPresetIndex());
                 sdk.NET_DVR_StopRealPlay(nativeLong);
             }
             startTime = System.currentTimeMillis();
             //图片质量
-            com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_JPEGPARA jpeg = new com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_JPEGPARA();
+            HCNetSDK.NET_DVR_JPEGPARA jpeg = new HCNetSDK.NET_DVR_JPEGPARA();
             // 设置图片的分辨率
             jpeg.wPicSize = 2;
             // 设置图片质量
@@ -177,7 +176,7 @@ public class TestHikvision implements Task {
     }
 
     public static MonitorCameraInfo getDVRConfig(MonitorCameraInfo cameraInfo) {
-        com.tree.clouds.schedule.common.hkws.windows.HCNetSDK sdk = com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.INSTANCE;
+        HCNetSDK sdk = HCNetSDK.INSTANCE;
         //判断摄像头是否开启
         if (!sdk.NET_DVR_Init()) {
             System.out.println("SDK初始化失败");
@@ -190,7 +189,7 @@ public class TestHikvision implements Task {
         sdk.NET_DVR_SetConnectTime(2000, 1);
         sdk.NET_DVR_SetReconnect(10000, true);
 
-        com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_DEVICEINFO_V30 devinfo = new com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_DEVICEINFO_V30();// 设备信息
+        HCNetSDK.NET_DVR_DEVICEINFO_V30 devinfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();// 设备信息
 
         //System.out.println("设备信息："+devinfo);
 
@@ -212,7 +211,7 @@ public class TestHikvision implements Task {
             return cameraInfo;
         }
         //DVR工作状态
-        com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_WORKSTATE_V30 devwork = new com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_WORKSTATE_V30();
+        HCNetSDK.NET_DVR_WORKSTATE_V30 devwork = new HCNetSDK.NET_DVR_WORKSTATE_V30();
         if (!sdk.NET_DVR_GetDVRWorkState_V30(cameraInfo.getUserId(), devwork)) {
             // 返回Boolean值，判断是否获取设备能力
             System.out.println("返回设备状态失败" + sdk.NET_DVR_GetLastError());
@@ -226,7 +225,7 @@ public class TestHikvision implements Task {
         }
 
         IntByReference ibrBytesReturned = new IntByReference(0);// 获取IP接入配置参数
-        com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_IPPARACFG ipcfg = new com.tree.clouds.schedule.common.hkws.windows.HCNetSDK.NET_DVR_IPPARACFG();//IP接入配置结构
+        HCNetSDK.NET_DVR_IPPARACFG ipcfg = new HCNetSDK.NET_DVR_IPPARACFG();//IP接入配置结构
         ipcfg.write();
         Pointer lpIpParaConfig = ipcfg.getPointer();
         //获取相关参数配置

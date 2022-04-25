@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.cron.CronUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tree.clouds.schedule.common.Constants;
-import com.tree.clouds.schedule.common.hkws.windows.HCNetSDK;
+import com.tree.clouds.schedule.common.hkws.HCNetSDK;
 import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.service.ScheduleTaskService;
 import com.tree.clouds.schedule.utils.SystemUtil;

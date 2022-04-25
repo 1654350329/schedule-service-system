@@ -1,11 +1,9 @@
 package com.tree.clouds.schedule.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tree.clouds.schedule.common.Constants;
 import com.tree.clouds.schedule.mapper.DeviceLogMapper;
-import com.tree.clouds.schedule.model.bo.DeviceLogBO;
 import com.tree.clouds.schedule.model.entity.DeviceInfo;
 import com.tree.clouds.schedule.model.entity.DeviceLog;
 import com.tree.clouds.schedule.service.DeviceInfoService;
@@ -13,7 +11,6 @@ import com.tree.clouds.schedule.service.DeviceLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.invoke.ConstantCallSite;
 import java.util.List;
 
 /**
