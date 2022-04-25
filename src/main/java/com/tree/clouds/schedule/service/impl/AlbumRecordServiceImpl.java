@@ -7,15 +7,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tree.clouds.schedule.common.Constants;
 import com.tree.clouds.schedule.common.ffmpeg.Move;
+import com.tree.clouds.schedule.config.websocket.WebSocket;
 import com.tree.clouds.schedule.mapper.AlbumRecordMapper;
-import com.tree.clouds.schedule.model.entity.AlbumRecord;
-import com.tree.clouds.schedule.model.entity.DeviceSchedule;
-import com.tree.clouds.schedule.model.entity.MusicManage;
+import com.tree.clouds.schedule.model.entity.*;
 import com.tree.clouds.schedule.model.vo.AlbumRecordPageVO;
 import com.tree.clouds.schedule.model.vo.BuildVideoVO;
-import com.tree.clouds.schedule.service.AlbumRecordService;
-import com.tree.clouds.schedule.service.DeviceScheduleService;
-import com.tree.clouds.schedule.service.MusicManageService;
+import com.tree.clouds.schedule.service.*;
 import com.tree.clouds.schedule.utils.DownloadFile;
 import com.tree.clouds.schedule.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +40,12 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
     private DeviceScheduleService deviceScheduleService;
     @Autowired
     private MusicManageService musicManageService;
-
+    @Autowired
+    private WebSocket webSocket;
+    @Autowired
+    private ScheduleTaskService scheduleTaskService;
+    @Autowired
+    private DeviceInfoService deviceInfoService;
 
     @Override
     public IPage<AlbumRecord> albumRecordPage(AlbumRecordPageVO albumRecordPageVO) {
@@ -73,6 +75,8 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
     public String buildVideo(BuildVideoVO buildVideoVO) {
         MusicManage musicManage = musicManageService.getById(buildVideoVO.getMusicId());
         DeviceSchedule service = deviceScheduleService.getByScheduleIdAndDeviceId(buildVideoVO.getScheduleId(), buildVideoVO.getDeviceId());
+        ScheduleTask scheduleTask = this.scheduleTaskService.getById(buildVideoVO.getScheduleId());
+        DeviceInfo deviceInfo = this.deviceInfoService.getById(buildVideoVO.getDeviceId());
         String sourcePath = Constants.SCHEDULE_PATH + service.getTaskId() + File.separator;
         List<String> sourcePaths = new ArrayList<>();
         for (String date : buildVideoVO.getData()) {
@@ -108,31 +112,27 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
         double time = FileUtil.ls(sourcePath).length / Double.parseDouble(buildVideoVO.getFps() + "");
         albumRecord.setDuration(time + "");
         this.save(albumRecord);
+        String userId = LoginUserUtil.getUserId();
         CompletableFuture.runAsync(new Runnable() {
             @Override
             public void run() {
                 Move.executeCmd(files, buildVideoVO.getFps(), outPutPath, musicManage.getFilePath());
                 AlbumRecord al = new AlbumRecord();
-                al.setRecordId(albumRecord.getTaskId());
+                al.setRecordId(albumRecord.getRecordId());
                 al.setDel(0);
                 updateById(al);
+                webSocket.sendMessage(scheduleTask.getScheduleName() + "-" + deviceInfo.getDeviceName() + "-视频生成成功", userId);
             }
         });
         return albumRecord.getRecordId();
     }
 
-    @Override
-    public Boolean buildVideo(String recordId) {
-        AlbumRecord albumRecord = this.getById(recordId);
-        if (FileUtil.exist(albumRecord.getFilePath())) {
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public int getRecordSum(String taskId) {
-        QueryWrapper<AlbumRecord> wrapper = new QueryWrapper<AlbumRecord>().eq(AlbumRecord.CREATED_USER, LoginUserUtil.getUserId());
+        QueryWrapper<AlbumRecord> wrapper = new QueryWrapper<AlbumRecord>()
+                .eq(AlbumRecord.CREATED_USER, LoginUserUtil.getUserId())
+                .eq(AlbumRecord.DEL, 0);
         if (taskId != null) {
             wrapper.eq(AlbumRecord.TASK_ID, taskId);
         }

@@ -250,13 +250,12 @@ public class Move extends Base implements Task {
                     while (in.available() > 0) {
                         c = new Character((char) in.read());
                         stringBuilder.append(c);
-                        System.out.print(c);
                     }
 
                     while (err.available() > 0) {
                         c = new Character((char) err.read());
                         stringBuilder.append(c);
-                        System.out.print(c);
+                        System.out.print(stringBuilder);
                     }
 
                     exitValue = p.exitValue();

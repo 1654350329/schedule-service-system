@@ -27,12 +27,6 @@ public interface AlbumRecordService extends IService<AlbumRecord> {
 
     String buildVideo(BuildVideoVO buildVideoVO);
 
-    /**
-     * 根据id是否已经生成视频
-     *
-     * @param recordId
-     */
-    Boolean buildVideo(String recordId);
 
     int getRecordSum(String taskId);
 

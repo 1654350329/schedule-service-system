@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.cron.CronUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tree.clouds.schedule.common.Constants;
-import com.tree.clouds.schedule.common.hkws.HCNetSDK;
+import com.tree.clouds.schedule.common.hkws.windows.HCNetSDK;
 import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.service.ScheduleTaskService;
 import com.tree.clouds.schedule.utils.SystemUtil;
@@ -25,8 +25,21 @@ public class JDDRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        if (SystemUtil.getSystemByName().equalsIgnoreCase("Linux")) {
+            //linux版本
+            Constants.STATIC_PATH = "/mydata/image/";
+            Constants.Root_PATH = "/mydata";
+            //抓拍图片存放路径
+            Constants.SCHEDULE_PATH = Constants.Root_PATH + "/image/";
+            Constants.MP4_PATH = Constants.Root_PATH + "/MP4/";
+            Constants.MUSIC_PATH = Constants.Root_PATH + "/music/";
+            Constants.HLS = Constants.Root_PATH + "/hls/";
+            Constants.ffmpeg_path = "ffmpeg";
+            Constants.HCNETSDK = "/jar/libhcnetsdk.so";
+            //预览路径
+            Constants.PREVIEW_PATH = Constants.SCHEDULE_PATH + "preview/";
+        }
         //海康威视名称
-        log.error("SystemUtil.getSystemByName() = " + SystemUtil.getSystemByName());
         if (!sdk.NET_DVR_Init()) {
             System.out.println("SDK初始化失败");
             log.error("SDK初始化失败");
@@ -34,6 +47,7 @@ public class JDDRunner implements ApplicationRunner {
         //设置连接时间与重连
         sdk.NET_DVR_SetConnectTime(2000, 1);
         sdk.NET_DVR_SetReconnect(10000, true);
+
         if (!CronUtil.getScheduler().isStarted()) {
             // 支持秒级别定时任务
             CronUtil.setMatchSecond(true);

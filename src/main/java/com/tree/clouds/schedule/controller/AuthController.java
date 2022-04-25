@@ -40,6 +40,7 @@ public class AuthController {
         Map<String, Object> map = new HashMap<>();
         map.put("roles", roles);
         map.put("name", user.getUserName());
+        map.put("userId", user.getUserId());
 
         return RestResponse.ok(map);
     }

@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/login-log/exportLoginLog/**",
             "/image/**",
             "/file/video/**",
-            "/album-record/getProgress/**"
+            "/websocket/**"
 
 
     };

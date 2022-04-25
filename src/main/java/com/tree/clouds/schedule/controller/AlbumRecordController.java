@@ -4,10 +4,12 @@ package com.tree.clouds.schedule.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tree.clouds.schedule.common.RestResponse;
 import com.tree.clouds.schedule.common.aop.Log;
+import com.tree.clouds.schedule.config.websocket.WebSocket;
 import com.tree.clouds.schedule.model.entity.AlbumRecord;
 import com.tree.clouds.schedule.model.vo.*;
 import com.tree.clouds.schedule.service.AlbumRecordService;
 import com.tree.clouds.schedule.service.ImageInfoService;
+import com.tree.clouds.schedule.utils.LoginUserUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -33,7 +36,8 @@ public class AlbumRecordController {
     private AlbumRecordService albumRecordService;
     @Autowired
     private ImageInfoService imageInfoService;
-
+    @Autowired
+    private WebSocket webSocket;
 
     @PostMapping("/albumRecordPage")
     @ApiOperation(value = "相册记录分页查询")
@@ -86,18 +90,6 @@ public class AlbumRecordController {
     public RestResponse<String> buildVideo(@RequestBody BuildVideoVO buildVideoVO) {
         String taskId = albumRecordService.buildVideo(buildVideoVO);
         return RestResponse.ok(taskId);
-    }
-
-    @PostMapping("/getProgress/{recordId}")
-    @ApiOperation(value = "自定义生成视频进度条")
-    @PreAuthorize("hasAuthority('login:log:list')")
-    public void getProgress(@PathVariable String recordId) {
-//        for (int i = 0; i < 100; i++) {
-//            MsgDTO msgDTO = new MsgDTO();
-//            msgDTO.setReceiverId(recordId);
-//            msgDTO.setMsgBody("成功发送"+i);
-//            WebSocketSupport.tryPush(msgDTO);
-//        }
     }
 
     @PostMapping("/removeVideo")
