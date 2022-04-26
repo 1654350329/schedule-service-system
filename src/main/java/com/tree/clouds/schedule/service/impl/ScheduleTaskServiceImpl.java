@@ -23,13 +23,17 @@ import com.tree.clouds.schedule.service.*;
 import com.tree.clouds.schedule.task.SumRiseSetTask;
 import com.tree.clouds.schedule.utils.BaseBusinessException;
 import com.tree.clouds.schedule.utils.LoginUserUtil;
+import com.tree.clouds.schedule.utils.MultipartFileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -228,6 +232,22 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             scheduleTaskQueryWrapper.eq(ScheduleTask.SCHEDULE_STATUS, type);
         }
         return this.count(scheduleTaskQueryWrapper);
+    }
+
+    @Override
+    public String uploadImage(MultipartFile multipartFile) {
+        String filepath = null;
+        try {
+            File file = MultipartFileUtil.multipartFileToFile(multipartFile);
+            filepath = Constants.WATERMARK_PATH + UUID.randomUUID() + file.getName();
+            FileUtil.move(file, new File(filepath), true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (filepath == null) {
+            throw new BaseBusinessException(400, "图片解析失败,请重新上传");
+        }
+        return filepath.replace(Constants.Root_PATH, "");
     }
 
 

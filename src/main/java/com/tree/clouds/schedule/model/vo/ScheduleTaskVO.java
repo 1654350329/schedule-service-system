@@ -39,4 +39,20 @@ public class ScheduleTaskVO {
 
     @ApiModelProperty(value = "背景音乐id")
     private String musicId;
+
+
+    @ApiModelProperty(value = "水印类型")
+    private Integer watermarkType;
+    @ApiModelProperty(value = "x坐标")
+    private Integer x;
+    @ApiModelProperty(value = "y坐标")
+    private Integer y;
+    @ApiModelProperty(value = "透明度 0.1 1")
+    private Float alpha;
+    @ApiModelProperty(value = "y坐标")
+    private String imagesPath;
+    @ApiModelProperty(value = "水印文字")
+    private String watermarkText;
+    @ApiModelProperty(value = "字体大小")
+    private Integer fontSize;
 }

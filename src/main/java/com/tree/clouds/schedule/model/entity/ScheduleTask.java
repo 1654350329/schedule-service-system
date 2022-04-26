@@ -97,4 +97,26 @@ public class ScheduleTask extends BaseEntity {
     @TableField("fps")
     private Integer fps;
 
+    @ApiModelProperty(value = "水印类型")
+    @TableField("watermark_Type")
+    private Integer watermarkType;
+    @ApiModelProperty(value = "x坐标")
+    @TableField("x")
+    private Integer x;
+    @ApiModelProperty(value = "y坐标")
+    @TableField("y")
+    private Integer y;
+    @ApiModelProperty(value = "透明度 0.1 1")
+    @TableField("alpha")
+    private Float alpha;
+    @ApiModelProperty(value = "y坐标")
+    @TableField("images_Path")
+    private String imagesPath;
+    @ApiModelProperty(value = "水印文字")
+    @TableField("watermark_Text")
+    private String watermarkText;
+    @ApiModelProperty(value = "字体大小")
+    @TableField("font_Size")
+    private Integer fontSize;
+
 }

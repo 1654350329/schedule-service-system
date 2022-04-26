@@ -23,6 +23,7 @@ public class Constants {
     public static String HCNETSDK = "HCNETSDK";
     //预览路径
     public static String PREVIEW_PATH = SCHEDULE_PATH + "preview\\";
-
+    //水印路径
+    public static String WATERMARK_PATH = SCHEDULE_PATH + "watermark\\";
 
 }

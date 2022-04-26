@@ -38,6 +38,7 @@ public class JDDRunner implements ApplicationRunner {
             Constants.HCNETSDK = "/jar/libhcnetsdk.so";
             //预览路径
             Constants.PREVIEW_PATH = Constants.SCHEDULE_PATH + "preview/";
+            Constants.WATERMARK_PATH = Constants.SCHEDULE_PATH + "watermark/";
         }
         sdk = HCNetSDK.INSTANCE;
         //海康威视名称

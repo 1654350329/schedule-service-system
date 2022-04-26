@@ -1,18 +1,14 @@
 package com.tree.clouds.schedule.common.ffmpeg.base;
 
 import com.tree.clouds.schedule.common.Constants;
-import com.tree.clouds.schedule.common.ffmpeg.Move;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.tree.clouds.schedule.common.ffmpeg.Test1.doWaitFor;
+import static com.tree.clouds.schedule.common.ffmpeg.Move.doWaitFor;
+
 
 /**
  * Created by feiFan.gou on 2017/8/17 14:40.

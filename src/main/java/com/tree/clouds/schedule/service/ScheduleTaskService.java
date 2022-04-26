@@ -1,10 +1,14 @@
 package com.tree.clouds.schedule.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.tree.clouds.schedule.model.bo.ScheduleTaskBO;
 import com.tree.clouds.schedule.model.entity.ScheduleTask;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.tree.clouds.schedule.model.vo.*;
+import com.tree.clouds.schedule.model.vo.ConfigureDetailVO;
+import com.tree.clouds.schedule.model.vo.DeviceScheduleVO;
+import com.tree.clouds.schedule.model.vo.ScheduleTaskPageVO;
+import com.tree.clouds.schedule.model.vo.ScheduleTaskVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,4 +41,6 @@ public interface ScheduleTaskService extends IService<ScheduleTask> {
     Boolean deleteConfigureDevice(String scheduleId, List<String> ids);
 
     int getTaskSum(Integer type);
+
+    String uploadImage(MultipartFile file);
 }

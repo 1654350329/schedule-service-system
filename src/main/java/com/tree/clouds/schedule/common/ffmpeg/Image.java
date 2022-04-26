@@ -1,9 +1,12 @@
 package com.tree.clouds.schedule.common.ffmpeg;
 
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.FileUtil;
 import com.tree.clouds.schedule.common.ffmpeg.base.Base;
 import com.tree.clouds.schedule.common.ffmpeg.kit.CommonKit;
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.File;
 
 /**
@@ -70,8 +73,22 @@ public class Image extends Base {
 
     @Test
     public void test() {
-        String sourcePath = "E:\\001.mp4";
-        toImage(sourcePath,
-                "E:\\", 10.004, "320x180");
+        ImgUtil.pressText(//
+                FileUtil.file("D:\\123.jpg"), //
+                FileUtil.file("D:\\123.jpg"), //
+                "版权所有", Color.WHITE, //文字
+                new Font("黑体", Font.BOLD, 100), //字体
+                -100, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                -100, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                0.5f//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+        );
+//        ImgUtil.pressImage(
+//                FileUtil.file("D:\\123.jpg"),
+//                FileUtil.file("D:\\12346546.jpg"),
+//                ImgUtil.read(FileUtil.file("D:\\1212.jpeg")), //水印图片
+//                0, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+//                -500, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+//                0.8f
+//        );
     }
 }

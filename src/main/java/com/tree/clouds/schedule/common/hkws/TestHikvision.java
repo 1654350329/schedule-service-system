@@ -11,10 +11,12 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.tree.clouds.schedule.common.Constants;
 import com.tree.clouds.schedule.model.entity.ImageInfo;
+import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.service.DeviceLogService;
 import com.tree.clouds.schedule.service.ImageInfoService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.awt.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,16 +39,18 @@ public class TestHikvision implements Task {
     private String endTime;
     private DeviceLogService deviceLogService;
     private ImageInfoService imageInfoService;
+    private ScheduleTask scheduleTask;
 
-    public TestHikvision(MonitorCameraInfo cameraInfo, String endTime, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
+    public TestHikvision(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, String endTime, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
         this.cameraInfo = cameraInfo;
+        this.scheduleTask = scheduleTask;
         this.endTime = endTime;
         this.deviceLogService = deviceLogService;
         this.imageInfoService = imageInfoService;
     }
 
     //抓拍图片
-    public static void getDVRPic(MonitorCameraInfo cameraInfo, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
+    public static void getDVRPic(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
 
         try {
             long startTime = System.currentTimeMillis();
@@ -126,6 +130,30 @@ public class TestHikvision implements Task {
             String dateTime = DateUtil.formatDateTime(new Date());
             // 存储本地，写入内容
             makeFile(byReference, jpegBuffer, file);
+            //添加文字水印
+            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 0) {
+                ImgUtil.pressText(//
+                        FileUtil.file(file.getAbsolutePath()), //
+                        FileUtil.file(file.getAbsolutePath()), //
+                        scheduleTask.getWatermarkText(), Color.WHITE, //文字
+                        new Font("黑体", Font.BOLD, 100), //字体
+                        scheduleTask.getX(), //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                        scheduleTask.getY(), //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                        scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+                );
+            }
+            //添加图片水印
+            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 1) {
+                ImgUtil.pressImage(
+                        FileUtil.file(file.getAbsolutePath()),
+                        FileUtil.file(file.getAbsolutePath()),
+                        ImgUtil.read(FileUtil.file(Constants.Root_PATH + scheduleTask.getImagesPath())), //水印图片
+                        scheduleTask.getX(), //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                        scheduleTask.getY(), //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                        scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+                );
+            }
+            //生成预览图
             File preFile = new File(Constants.PREVIEW_PATH + UUID.randomUUID() + file.getName());
             ImgUtil.scale(
                     FileUtil.file(file.getAbsolutePath()),
@@ -158,6 +186,19 @@ public class TestHikvision implements Task {
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
+    }
+
+    public void execute() {
+        if (endTime != null) {
+            DateTime parse = DateUtil.parse(endTime, "yyyy-MM-dd HH:mm:ss");
+            if (new Date().getTime() > parse.getTime()) {
+                CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
+                Constants.scheduleMap.remove(cameraInfo.getTaskId());
+                return;
+            }
+        }
+        getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);
+
     }
 
     private static void makeFile(IntByReference byReference, ByteBuffer jpegBuffer, File file) {
@@ -259,16 +300,5 @@ public class TestHikvision implements Task {
         return cameraInfo;
     }
 
-    public void execute() {
-        if (endTime != null) {
-            DateTime parse = DateUtil.parse(endTime, "yyyy-MM-dd HH:mm:ss");
-            if (new Date().getTime() > parse.getTime()) {
-                CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
-                Constants.scheduleMap.remove(cameraInfo.getTaskId());
-                return;
-            }
-        }
-        getDVRPic(cameraInfo, deviceLogService, imageInfoService);
 
-    }
 }
