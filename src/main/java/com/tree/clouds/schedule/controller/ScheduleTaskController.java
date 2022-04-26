@@ -113,10 +113,10 @@ public class ScheduleTaskController {
                 throw new BaseBusinessException(400, "请先添加设备!");
             }
             ScheduleTask scheduleTask = this.scheduleTaskService.getById(id);
-            if (scheduleTask.getTaskType() == 1) {
+            if (scheduleTask.getTaskType() == 0) {
                 scheduleTask.setEndTime("08:00:00");
             }
-            if (scheduleTask.getTaskType() == 2) {
+            if (scheduleTask.getTaskType() == 1) {
                 scheduleTask.setEndTime("19:30:00");
             }
             String dateTime = scheduleTask.getEndDate() + " " + scheduleTask.getEndTime();

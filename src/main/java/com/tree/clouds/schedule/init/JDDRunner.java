@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 @Slf4j
 public class JDDRunner implements ApplicationRunner {
-    public static HCNetSDK sdk = HCNetSDK.INSTANCE;
+    public static HCNetSDK sdk;
     @Autowired
     private ScheduleTaskService scheduleTaskService;
 
@@ -39,6 +39,7 @@ public class JDDRunner implements ApplicationRunner {
             //预览路径
             Constants.PREVIEW_PATH = Constants.SCHEDULE_PATH + "preview/";
         }
+        sdk = HCNetSDK.INSTANCE;
         //海康威视名称
         if (!sdk.NET_DVR_Init()) {
             System.out.println("SDK初始化失败");

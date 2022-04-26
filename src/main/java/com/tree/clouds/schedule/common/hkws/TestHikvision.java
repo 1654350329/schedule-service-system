@@ -144,6 +144,10 @@ public class TestHikvision implements Task {
             imageInfoService.save(imageInfo);
             log.info("抓取成功,返回长度：" + byReference.getValue());
             log.info("存储本地耗时：[" + (System.currentTimeMillis() - startTime) + "ms]");
+            //第一次启动 记录
+            if (!deviceMap.containsKey(cameraInfo.getDeviceId())) {
+                deviceLogService.saveLog(cameraInfo.getDeviceId(), null, true);
+            }
             //只记录失败后第一次恢复日志
             if (deviceMap.containsKey(cameraInfo.getDeviceId()) && !deviceMap.get(cameraInfo.getDeviceId())) {
                 deviceLogService.saveLog(cameraInfo.getDeviceId(), null, true);

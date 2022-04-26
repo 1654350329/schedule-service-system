@@ -381,7 +381,7 @@ public class Move extends Base implements Task {
         double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
         albumRecord.setDuration(time + "");
         albumRecordService.save(albumRecord);
-//        FileUtil.del(files);
+        FileUtil.del(files);
     }
 
 }
