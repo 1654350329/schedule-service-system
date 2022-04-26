@@ -1,11 +1,9 @@
 package com.tree.clouds.schedule.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tree.clouds.schedule.model.entity.ImageInfo;
 import com.tree.clouds.schedule.model.vo.ImageInfoVO;
-import com.tree.clouds.schedule.model.vo.TreeVO;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -29,5 +27,5 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
 
     List<String> getDateDay(String taskId, String year, String month);
 
-    List<ImageInfo> getByDate(String taskId, String year, String month, String day);
+    IPage<ImageInfo> getByDate(IPage<ImageInfo> page, String taskId, String year, String month, String day);
 }

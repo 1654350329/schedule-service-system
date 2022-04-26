@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tree.clouds.schedule.common.RestResponse;
 import com.tree.clouds.schedule.common.aop.Log;
 import com.tree.clouds.schedule.model.entity.AlbumRecord;
+import com.tree.clouds.schedule.model.entity.ImageInfo;
 import com.tree.clouds.schedule.model.vo.*;
 import com.tree.clouds.schedule.service.AlbumRecordService;
 import com.tree.clouds.schedule.service.ImageInfoService;
@@ -56,9 +57,9 @@ public class AlbumRecordController {
     @ApiOperation(value = "相册图片列表")
     @Log("相册图片列表")
     @PreAuthorize("hasAuthority('login:log:list')")
-    public RestResponse<List<DateListVO>> dateList(@RequestBody ImageInfoVO imageInfoVO) {
-        List<DateListVO> dateList = imageInfoService.dateList(imageInfoVO);
-        return RestResponse.ok(dateList);
+    public RestResponse<IPage<ImageInfo>> dateList(@RequestBody ImageInfoVO imageInfoVO) {
+        IPage<ImageInfo> page = imageInfoService.dateList(imageInfoVO);
+        return RestResponse.ok(page);
     }
 
     @PostMapping("/dateTree")

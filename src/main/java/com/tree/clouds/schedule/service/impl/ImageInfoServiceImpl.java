@@ -1,11 +1,11 @@
 package com.tree.clouds.schedule.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tree.clouds.schedule.mapper.ImageInfoMapper;
 import com.tree.clouds.schedule.model.entity.DeviceSchedule;
 import com.tree.clouds.schedule.model.entity.ImageInfo;
-import com.tree.clouds.schedule.model.vo.DateListVO;
 import com.tree.clouds.schedule.model.vo.ImageInfoVO;
 import com.tree.clouds.schedule.service.DeviceScheduleService;
 import com.tree.clouds.schedule.service.ImageInfoService;
@@ -32,16 +32,11 @@ public class ImageInfoServiceImpl extends ServiceImpl<ImageInfoMapper, ImageInfo
 
 
     @Override
-    public List<DateListVO> dateList(ImageInfoVO imageInfoVO) {
+    public IPage<ImageInfo> dateList(ImageInfoVO imageInfoVO) {
+        IPage<ImageInfo> page = imageInfoVO.getPage();
         DeviceSchedule deviceSchedule = deviceScheduleService.getByScheduleIdAndDeviceId(imageInfoVO.getScheduleId(), imageInfoVO.getDeviceId());
-        List<DateListVO> dateListVOS = new ArrayList<>();
-        DateListVO dateListVO = new DateListVO();
-        String key = imageInfoVO.getYear() + "-" + imageInfoVO.getMonth() + "-" + imageInfoVO.getDay();
-        List<ImageInfo> imageInfos = this.baseMapper.getByDate(deviceSchedule.getTaskId(), imageInfoVO.getYear(), imageInfoVO.getMonth(), imageInfoVO.getDay());
-        dateListVO.setDate(key);
-        dateListVO.setImageInfos(imageInfos);
-        dateListVOS.add(dateListVO);
-        return dateListVOS;
+        page = this.baseMapper.getByDate(page, deviceSchedule.getTaskId(), imageInfoVO.getYear(), imageInfoVO.getMonth(), imageInfoVO.getDay());
+        return page;
     }
 
     @Override

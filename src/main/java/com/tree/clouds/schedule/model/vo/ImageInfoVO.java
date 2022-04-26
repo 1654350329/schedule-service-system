@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class ImageInfoVO {
+public class ImageInfoVO extends PageParam {
     @ApiModelProperty("计划id")
     private String scheduleId;
     @ApiModelProperty("设备id")

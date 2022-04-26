@@ -1,8 +1,8 @@
 package com.tree.clouds.schedule.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tree.clouds.schedule.model.entity.ImageInfo;
-import com.tree.clouds.schedule.model.vo.DateListVO;
 import com.tree.clouds.schedule.model.vo.ImageInfoVO;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface ImageInfoService extends IService<ImageInfo> {
 
-    List<DateListVO> dateList(ImageInfoVO imageInfoVO);
+    IPage<ImageInfo> dateList(ImageInfoVO imageInfoVO);
 
     List<ImageInfo> imageInfos(List<String> ids);
 
