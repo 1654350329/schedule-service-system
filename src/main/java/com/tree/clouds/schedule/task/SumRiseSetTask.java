@@ -85,7 +85,7 @@ public class SumRiseSetTask implements Task {
                     scheduleCycle = String.format("%s */%s * * * ? *", split[2], scheduleTask.getFrequency());
                 }
                 if (scheduleTask.getFrequencyUnit() == 2) {
-                    scheduleCycle = String.format("%s %s /%s * * ? *", split[2], split[1], scheduleTask.getFrequency());
+                    scheduleCycle = String.format("%s %s */%s * * ? *", split[2], split[1], scheduleTask.getFrequency());
                 }
                 String endTime = (DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime());
                 DateTime dateTime = DateUtil.parse(endTime, "yyyy-MM-dd HH:mm:ss");
