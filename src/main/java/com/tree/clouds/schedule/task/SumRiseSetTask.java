@@ -76,7 +76,7 @@ public class SumRiseSetTask implements Task {
                     scheduleCycle = String.format("%s %s */%s * * ? *", split[2], split[1], scheduleTask.getFrequency());
                 }
                 String endTime = (DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime());
-                if (DateUtil.parseTime(scheduleTask.getEndTime()).getTime() > DateUtil.parseTime(scheduleTask.getStartTime()).getTime()) {
+                if (DateUtil.parseTime(scheduleTask.getEndTime()).getTime() < DateUtil.parseTime(scheduleTask.getStartTime()).getTime()) {
                     endTime = DateUtil.formatDate(DateUtil.tomorrow()) + " " + scheduleTask.getEndTime();
                 }
                 DateTime dateTime = DateUtil.parseDateTime(endTime);

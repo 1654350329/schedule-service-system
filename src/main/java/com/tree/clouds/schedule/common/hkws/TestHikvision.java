@@ -132,7 +132,7 @@ public class TestHikvision implements Task {
             // 存储本地，写入内容
             makeFile(byReference, jpegBuffer, file);
             //添加文字水印
-            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 0) {
+            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 1) {
                 ImgUtil.pressText(//
                         FileUtil.file(file.getAbsolutePath()), //
                         FileUtil.file(file.getAbsolutePath()), //
@@ -144,7 +144,7 @@ public class TestHikvision implements Task {
                 );
             }
             //添加图片水印
-            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 1) {
+            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 2) {
                 log.warn("添加图片水印：" + Constants.Root_PATH + scheduleTask.getImagesPath());
                 ImgUtil.pressImage(
                         FileUtil.file(file.getAbsolutePath()),

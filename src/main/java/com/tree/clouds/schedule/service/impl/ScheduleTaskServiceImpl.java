@@ -186,7 +186,7 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             log.info("日落计划schedulingPattern = " + schedulingPattern);
         }
         //自定义时间
-        if (scheduleTask.getTaskType() == 2) {
+        if (scheduleTask.getTaskType() == 2 || scheduleTask.getTaskType() == 7) {
             //执行时间
             String date = scheduleTask.getStartDate() + " " + scheduleTask.getStartTime();
             DateTime parseDate = DateUtil.parseDateTime(date);
