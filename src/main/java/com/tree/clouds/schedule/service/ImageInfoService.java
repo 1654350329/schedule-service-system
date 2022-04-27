@@ -25,4 +25,5 @@ public interface ImageInfoService extends IService<ImageInfo> {
 
     int getImageSum(String taskId);
 
+    List<String> getFilePath(String taskId, String startTime, String endTime);
 }

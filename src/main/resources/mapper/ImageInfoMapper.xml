@@ -69,5 +69,8 @@
         </where>
         order by created_Time
     </select>
+    <select id="getFilePath" resultType="java.lang.String">
+        SELECT file_path FROM `image_info` where created_time >=#{startTime} and created_time  &lt;=#{endTime} ORDER BY created_time asc
+    </select>
 
 </mapper>

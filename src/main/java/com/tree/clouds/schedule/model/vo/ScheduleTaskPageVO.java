@@ -1,6 +1,5 @@
 package com.tree.clouds.schedule.model.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -9,10 +8,10 @@ public class ScheduleTaskPageVO extends PageParam {
     @ApiModelProperty(value = "任务名称")
     private String scheduleName;
 
-    @ApiModelProperty(value = "每日执行开始时间 格式 时 分 秒 ", example = "06")
+    @ApiModelProperty(value = "每日执行开始时间 格式 时 分 秒 ", example = "06:00:00")
     private String startTime;
 
-    @ApiModelProperty(value = "每日执行结束时间 格式 时", example = "08")
+    @ApiModelProperty(value = "每日执行结束时间 格式 时", example = "08:00:00")
     private String endTime;
 
     @ApiModelProperty(value = "执行结束日期", example = "2023-04-01")

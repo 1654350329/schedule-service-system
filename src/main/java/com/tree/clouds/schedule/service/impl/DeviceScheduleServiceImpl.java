@@ -115,15 +115,20 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         //抓拍1小时
         TestHikvision testHikvision = null;
         if (task.getTaskType() == 0) {
-            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time + 1000 * 60 * 60)), deviceLogService, imageInfoService);
+            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
         }
         if (task.getTaskType() == 1) {
-            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time + 1000 * 60 * 60)), deviceLogService, imageInfoService);
+            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
         }
         if (task.getTaskType() == 2) {
             //自定义时间 需指定任务结束日期
             testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
             CronUtil.remove(task.getScheduleNumber());
+        }
+        //月满计划
+        if (task.getTaskType() == 3) {
+            //自定义时间 需指定任务结束日期
+            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
         }
         String schedule = CronUtil.schedule(scheduleCycle, testHikvision);
         //判断是否到结束日期 结束移除任务
@@ -155,6 +160,12 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         if (scheduleTask.getTaskType() == 2 && scheduleTask.getCycle() == 0) {
             cron = "0 0 1 */1 * ? *";
         }
+        if (scheduleTask.getTaskType() == 3 && scheduleTask.getCycle() == 0) {
+            cron = "0 0 8 */1 * ? *";
+        }
+        if (scheduleTask.getTaskType() == 7 && scheduleTask.getCycle() == 0) {
+            cron = String.format("0 0 %s */1 * ? *", Integer.parseInt(scheduleTask.getEndTime().split(":")[0]) + 1);
+        }
         if (scheduleTask.getCycle() == 1) {
             cron = "0 0 0 ? * MON";
         }
@@ -167,7 +178,7 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         List<DeviceSchedule> deviceSchedules = this.getByScheduleId(scheduleTask.getScheduleId());
         for (DeviceSchedule deviceSchedule : deviceSchedules) {
             log.info("归档周期 = " + cron + " 任务号:" + deviceSchedule.getTaskId());
-            String schedule = CronUtil.schedule(cron, new Move(scheduleTask.getCreatedUser(), scheduleTask.getTaskType(), scheduleTask.getCycle(), dateTime, deviceSchedule.getTaskId(), musicPath, scheduleTask.getFps() == null ? 24 : scheduleTask.getFps(), albumRecordService));
+            String schedule = CronUtil.schedule(cron, new Move(scheduleTask, deviceSchedule.getTaskId(), dateTime, musicPath, albumRecordService, imageInfoService));
             //存放任务队列信息
             Constants.taskMap.put(deviceSchedule.getTaskId(), schedule);
         }

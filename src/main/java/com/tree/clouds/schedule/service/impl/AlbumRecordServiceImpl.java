@@ -122,6 +122,7 @@ public class AlbumRecordServiceImpl extends ServiceImpl<AlbumRecordMapper, Album
                 al.setDel(0);
                 updateById(al);
                 webSocket.sendMessage(scheduleTask.getScheduleName() + "-" + deviceInfo.getDeviceName() + "-视频生成成功", userId);
+                FileUtil.del(files);
             }
         });
         return albumRecord.getRecordId();

@@ -67,9 +67,14 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
                 record.setImageNumber(this.imageInfoService.getImageSum(deviceSchedule.getTaskId()));
                 record.setVideoNumber(this.albumRecordService.getRecordSum(deviceSchedule.getTaskId()));
             }
+            //跨夜计划 展示为自定义计划
+            if (record.getTaskType() == 7) {
+                record.setTaskType(2);
+            }
             if (record.getTaskType() == 2) {
                 record.setTime(record.getStartTime() + " 至 " + record.getEndTime());
             }
+
             record.setDate(record.getStartDate() + " 至 " + record.getEndDate());
             int size = deviceScheduleService.getByScheduleId(record.getScheduleId()).size();
             record.setDeviceNumber(size);
@@ -145,6 +150,8 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
     @Override
     public void startSchedule(String scheduleId) {
         ScheduleTask scheduleTask = this.getById(scheduleId);
+        //开启归档任务
+        deviceScheduleService.archiveTask(scheduleTask);
         String dateTime = scheduleTask.getEndDate() + " " + scheduleTask.getEndTime() + ":59:59";
         if (new Date().getTime() > DateUtil.parseDateTime(dateTime).getTime()) {
             return;
@@ -193,7 +200,21 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
             log.info("自定义计划schedulingPattern = " + schedulingPattern);
         }
-
+        //满月计划
+        if (scheduleTask.getTaskType() == 3) {
+            //执行时间
+            String date = scheduleTask.getStartDate();
+            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 16:28:00");
+            if (parseDate.getTime() <= new Date().getTime()) {
+                date = DateUtil.formatDate(new Date());
+            }
+            String[] dates = date.split("-");
+            String schedulingPattern = String.format("0 51 15 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
+//            String schedulingPattern = String.format("0 30 16 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
+            SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
+            schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
+            log.info("满月计划schedulingPattern = " + schedulingPattern);
+        }
         if (!CronUtil.getScheduler().isStarted()) {
             // 支持秒级别定时任务
             CronUtil.setMatchSecond(true);

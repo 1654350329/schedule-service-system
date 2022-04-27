@@ -34,7 +34,7 @@ public class ScheduleTaskVO {
     @ApiModelProperty(value = "抽帧码率0超清 1高清 2标清")
     private Integer codeRate;
 
-    @ApiModelProperty(value = "任务类型 0 日出 1日落 2自定义")
+    @ApiModelProperty(value = "任务类型 0 日出 1日落 2自定义 3跨夜 4满月计划")
     private Integer taskType;
 
     @ApiModelProperty(value = "背景音乐id")

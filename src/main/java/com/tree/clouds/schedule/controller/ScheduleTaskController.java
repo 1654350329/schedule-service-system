@@ -90,6 +90,10 @@ public class ScheduleTaskController {
     @Log("修改计划配置")
     @PreAuthorize("hasAuthority('login:log:list')")
     public RestResponse<Boolean> updateSchedule(@RequestBody ScheduleTaskVO scheduleTaskVO) {
+        if (DateUtil.parseTime(scheduleTaskVO.getEndTime()).getTime() < DateUtil.parseTime(scheduleTaskVO.getStartTime()).getTime()) {
+            //跨夜计划
+            scheduleTaskVO.setTaskType(7);
+        }
         scheduleTaskService.updateSchedule(scheduleTaskVO);
         return RestResponse.ok(true);
     }

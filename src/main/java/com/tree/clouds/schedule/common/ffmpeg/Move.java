@@ -10,7 +10,9 @@ import cn.hutool.cron.task.Task;
 import com.tree.clouds.schedule.common.Constants;
 import com.tree.clouds.schedule.common.ffmpeg.base.Base;
 import com.tree.clouds.schedule.model.entity.AlbumRecord;
+import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.service.AlbumRecordService;
+import com.tree.clouds.schedule.service.ImageInfoService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -23,23 +25,139 @@ import java.util.stream.Collectors;
 public class Move extends Base implements Task {
 
     private AlbumRecordService albumRecordService;
-    private Integer cycle;
     private String taskId;
-    private String musicPath;
-    private int fps;
-    private int type;
     private DateTime endTime;
-    private String creatUser;
+    private String musicPath;
 
-    public Move(String creatUser, Integer type, Integer cycle, DateTime endTime, String taskId, String musicPath, int fps, AlbumRecordService albumRecordService) {
-        this.type = type;
-        this.creatUser = creatUser;
-        this.cycle = cycle;
-        this.endTime = endTime;
+
+    private ScheduleTask scheduleTask;
+    private ImageInfoService imageInfoService;
+
+
+    public Move(ScheduleTask scheduleTask, String taskId, DateTime endTime, String musicPath, AlbumRecordService albumRecordService, ImageInfoService imageInfoService) {
+        this.scheduleTask = scheduleTask;
         this.taskId = taskId;
-        this.fps = fps;
+        this.endTime = endTime;
         this.musicPath = musicPath;
         this.albumRecordService = albumRecordService;
+        this.imageInfoService = imageInfoService;
+    }
+
+    @Override
+    public void execute() {
+        //判断是否结束归档
+        if (endTime != null) {
+            if (new Date().getTime() > endTime.getTime()) {
+                CronUtil.remove(Constants.taskMap.get(taskId));
+                Constants.taskMap.remove(taskId);
+                return;
+            }
+        }
+
+        log.info("开始任务归档" + taskId);
+        String[] split = DateUtil.formatDate(DateUtil.yesterday()).split("-");
+        List<String> sourcePaths = new ArrayList<>();
+        String sourcePath = Constants.SCHEDULE_PATH + taskId + File.separator;
+        String playPeriod = null;
+        if (scheduleTask != null && (scheduleTask.getTaskType() == 7 || scheduleTask.getTaskType() == 3)) {
+            String startTime = null;
+            String endTime = null;
+            if (scheduleTask.getTaskType() == 7) {
+                startTime = DateUtil.formatDate(DateUtil.yesterday()) + " " + scheduleTask.getStartTime();
+                endTime = DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime();
+
+            }
+            if (scheduleTask.getTaskType() == 3) {
+                startTime = DateUtil.formatDate(DateUtil.yesterday()) + " " + "16:00:00";
+                endTime = DateUtil.formatDate(new Date()) + " " + "8:00:00";
+            }
+            playPeriod = startTime + " 至 " + endTime;
+            List<String> imageInfos = this.imageInfoService.getFilePath(taskId, startTime, endTime);
+            for (String imageInfo : imageInfos) {
+                imageInfo = Constants.SCHEDULE_PATH + imageInfo;
+                sourcePaths.add(imageInfo);
+            }
+        } else {
+            if (scheduleTask.getCycle() == 0 && (scheduleTask.getTaskType() == 0 || scheduleTask.getTaskType() == 1)) {
+                split = DateUtil.formatDate(new Date()).split("-");
+                playPeriod = DateUtil.formatDate((new Date())) + " 至 " + DateUtil.formatDate((new Date()));
+                String path = sourcePath + split[0] + File.separator + split[1] + File.separator + split[2];
+                sourcePaths.add(path);
+            }
+            if (scheduleTask.getCycle() == 0 && scheduleTask.getTaskType() == 2) {
+                playPeriod = DateUtil.formatDate(DateUtil.yesterday()) + " 至 " + DateUtil.formatDate(DateUtil.yesterday());
+                String path = sourcePath + split[0] + File.separator + split[1] + File.separator + split[2];
+                sourcePaths.add(path);
+            }
+            if (scheduleTask.getCycle() == 1) {
+                playPeriod = DateUtil.formatDate(geLastWeekMonday(new Date(), 1)) + " " + DateUtil.formatDate(geLastWeekMonday(new Date(), 7));
+                for (int i = 1; i <= 7; i++) {
+                    //取上周的年月日
+                    String[] dateTime = DateUtil.formatDate(geLastWeekMonday(new Date(), i)).split("-");
+                    String path = sourcePath + dateTime[0] + File.separator + dateTime[1] + File.separator + dateTime[2];
+                    sourcePaths.add(path);
+                }
+            }
+            if (scheduleTask.getCycle() == 2) {
+                // 获取上个月的第一天和最后一天
+                Calendar cale = Calendar.getInstance();
+                cale.add(Calendar.MONTH, 0);
+                cale.set(Calendar.DAY_OF_MONTH, 1);
+                String start = DateUtil.formatDate(cale.getTime());
+                cale.set(Calendar.DAY_OF_MONTH, 0);
+                playPeriod = start + " 至 " + DateUtil.formatDate(cale.getTime());
+                String[] dateTime = DateUtil.formatDate(DateUtil.lastMonth()).split("-");
+                String path = sourcePath + dateTime[0] + File.separator + dateTime[1] + File.separator + dateTime[2];
+                sourcePaths.add(path);
+            }
+            if (scheduleTask.getCycle() == 3) {
+                Calendar cale = Calendar.getInstance();
+                int currentYear = cale.get(Calendar.YEAR);
+                cale.clear();
+                cale.set(Calendar.YEAR, currentYear);
+                cale.roll(Calendar.DAY_OF_YEAR, -1);
+                Date currYearLast = cale.getTime();
+                playPeriod = (DateUtil.year(new Date()) - 1) + "-01-01" + "至" + DateUtil.formatDate(currYearLast);
+                String path = sourcePath + (Integer.parseInt(split[0]) - 1);
+                sourcePaths.add(path);
+            }
+        }
+
+        String files = copyListFiles(sourcePaths);
+        String outputName = DateUtil.format(new Date(), "YYYYMMddHHmmss");
+        String outPutPath = Constants.MP4_PATH + taskId + File.separator + outputName + ".mp4";
+        if (!FileUtil.exist(Constants.MP4_PATH + taskId)) {
+            FileUtil.mkdir(Constants.MP4_PATH + taskId);
+        }
+        log.info("outPutPath = " + outPutPath);
+
+        executeCmd(files, scheduleTask.getFps(), outPutPath, musicPath);
+        //生成点播地址
+//        buildM3u8(outPutPath, Constants.HLS + outputName);
+
+        //存放记录
+        AlbumRecord albumRecord = new AlbumRecord();
+        albumRecord.setTaskId(taskId);
+        albumRecord.setPlayPeriod(playPeriod);
+        albumRecord.setFilePath(outPutPath);
+        albumRecord.setFileName(outputName + ".mp4");
+        albumRecord.setCreatedUser(scheduleTask.getCreatedUser());
+//        albumRecord.setFileAddress(Constants.HLS + outputName);
+        //取文件夹第一张图片为封面
+        String previewImage = Constants.PREVIEW_PATH + taskId + File.separator + outputName + "_pre.jpg";
+        if (!FileUtil.exist(Constants.PREVIEW_PATH + taskId)) {
+            FileUtil.mkdir(Constants.PREVIEW_PATH + taskId);
+        }
+        if (FileUtil.exist(files + "0.jpg")) {
+            FileUtil.copy(files + "0.jpg", previewImage, true);
+        }
+        albumRecord.setPreviewImage(previewImage.replace(Constants.Root_PATH, ""));
+        File file = new File(outPutPath);
+        albumRecord.setFileSize(file.length() / 1024);//以k为单位
+        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(scheduleTask.getFps()));
+        albumRecord.setDuration(time + "");
+        albumRecordService.save(albumRecord);
+        FileUtil.del(files);
     }
 
     public static synchronized void buildM3u8(String sourcePath, String outPath) {
@@ -285,103 +403,4 @@ public class Move extends Base implements Task {
 
         return stringBuilder;
     }
-
-    @Override
-    public void execute() {
-        //判断是否结束归档
-        if (endTime != null) {
-            if (new Date().getTime() > endTime.getTime()) {
-                CronUtil.remove(Constants.taskMap.get(taskId));
-                Constants.taskMap.remove(taskId);
-                return;
-            }
-        }
-
-
-        log.info("开始任务归档" + taskId);
-        String[] split = DateUtil.formatDate(DateUtil.yesterday()).split("-");
-//        String[] split = DateUtil.formatDate(new Date()).split("-");
-        List<String> sourcePaths = new ArrayList<>();
-        String sourcePath = Constants.SCHEDULE_PATH + taskId + File.separator;
-        String playPeriod = null;
-        if (cycle == 0 && (type == 0 || type == 1)) {
-            split = DateUtil.formatDate(new Date()).split("-");
-            playPeriod = DateUtil.formatDate((new Date())) + " 至 " + DateUtil.formatDate((new Date()));
-            String path = sourcePath + split[0] + File.separator + split[1] + File.separator + split[2];
-            sourcePaths.add(path);
-        }
-        if (cycle == 0 && type == 2) {
-            playPeriod = DateUtil.formatDate(DateUtil.yesterday()) + " 至 " + DateUtil.formatDate(DateUtil.yesterday());
-            String path = sourcePath + split[0] + File.separator + split[1] + File.separator + split[2];
-            sourcePaths.add(path);
-        }
-        if (cycle == 1) {
-            playPeriod = DateUtil.formatDate(geLastWeekMonday(new Date(), 1)) + " " + DateUtil.formatDate(geLastWeekMonday(new Date(), 7));
-            for (int i = 1; i <= 7; i++) {
-                //取上周的年月日
-                String[] dateTime = DateUtil.formatDate(geLastWeekMonday(new Date(), i)).split("-");
-                String path = sourcePath + dateTime[0] + File.separator + dateTime[1] + File.separator + dateTime[2];
-                sourcePaths.add(path);
-            }
-        }
-        if (cycle == 2) {
-            // 获取上个月的第一天和最后一天
-            Calendar cale = Calendar.getInstance();
-            cale.add(Calendar.MONTH, 0);
-            cale.set(Calendar.DAY_OF_MONTH, 1);
-            String start = DateUtil.formatDate(cale.getTime());
-            cale.set(Calendar.DAY_OF_MONTH, 0);
-            playPeriod = start + " 至 " + DateUtil.formatDate(cale.getTime());
-            String[] dateTime = DateUtil.formatDate(DateUtil.lastMonth()).split("-");
-            String path = sourcePath + dateTime[0] + File.separator + dateTime[1] + File.separator + dateTime[2];
-            sourcePaths.add(path);
-        }
-        if (cycle == 3) {
-            Calendar cale = Calendar.getInstance();
-            int currentYear = cale.get(Calendar.YEAR);
-            cale.clear();
-            cale.set(Calendar.YEAR, currentYear);
-            cale.roll(Calendar.DAY_OF_YEAR, -1);
-            Date currYearLast = cale.getTime();
-            playPeriod = (DateUtil.year(new Date()) - 1) + "-01-01" + "至" + DateUtil.formatDate(currYearLast);
-            String path = sourcePath + (Integer.parseInt(split[0]) - 1);
-            sourcePaths.add(path);
-        }
-        String files = copyListFiles(sourcePaths);
-        String outputName = DateUtil.format(new Date(), "YYYYMMddHHmmss");
-        String outPutPath = Constants.MP4_PATH + taskId + File.separator + outputName + ".mp4";
-        if (!FileUtil.exist(Constants.MP4_PATH + taskId)) {
-            FileUtil.mkdir(Constants.MP4_PATH + taskId);
-        }
-        log.info("outPutPath = " + outPutPath);
-
-        executeCmd(files, fps, outPutPath, musicPath);
-        //生成点播地址
-//        buildM3u8(outPutPath, Constants.HLS + outputName);
-
-        //存放记录
-        AlbumRecord albumRecord = new AlbumRecord();
-        albumRecord.setTaskId(taskId);
-        albumRecord.setPlayPeriod(playPeriod);
-        albumRecord.setFilePath(outPutPath);
-        albumRecord.setFileName(outputName + ".mp4");
-        albumRecord.setCreatedUser(creatUser);
-//        albumRecord.setFileAddress(Constants.HLS + outputName);
-        //取文件夹第一张图片为封面
-        String previewImage = Constants.PREVIEW_PATH + taskId + File.separator + outputName + "_pre.jpg";
-        if (!FileUtil.exist(Constants.PREVIEW_PATH + taskId)) {
-            FileUtil.mkdir(Constants.PREVIEW_PATH + taskId);
-        }
-        if (FileUtil.exist(files + "0.jpg")) {
-            FileUtil.copy(files + "0.jpg", previewImage, true);
-        }
-        albumRecord.setPreviewImage(previewImage.replace(Constants.Root_PATH, ""));
-        File file = new File(outPutPath);
-        albumRecord.setFileSize(file.length() / 1024);//以k为单位
-        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
-        albumRecord.setDuration(time + "");
-        albumRecordService.save(albumRecord);
-        FileUtil.del(files);
-    }
-
 }

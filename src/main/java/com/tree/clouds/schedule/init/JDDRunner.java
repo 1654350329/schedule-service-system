@@ -70,6 +70,7 @@ public class JDDRunner implements ApplicationRunner {
         FileUtil.mkdir(Constants.SCHEDULE_PATH);
         FileUtil.mkdir(Constants.HLS);
         FileUtil.mkdir(Constants.WATERMARK_PATH);
+        FileUtil.mkdir(Constants.TMP_HOME);
 
     }
 

@@ -28,4 +28,14 @@ public interface ImageInfoMapper extends BaseMapper<ImageInfo> {
     List<String> getDateDay(String taskId, String year, String month);
 
     IPage<ImageInfo> getByDate(IPage<ImageInfo> page, String taskId, String year, String month, String day);
+
+    /**
+     * 根据任务 开始时间结束时间获取路径
+     *
+     * @param taskId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<String> getFilePath(String taskId, String startTime, String endTime);
 }

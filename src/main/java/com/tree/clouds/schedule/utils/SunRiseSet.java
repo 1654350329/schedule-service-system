@@ -1,18 +1,17 @@
 package com.tree.clouds.schedule.utils;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.cron.CronUtil;
-import com.tree.clouds.schedule.common.Constants;
+import cn.hutool.core.date.ChineseDate;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class SunRiseSet {
 
-    private final static double h = -0.833;//日出日落时太阳的位置
+    //    private final static double h = -0.833;//日出日落时太阳的位置
+    private final static double h = -9.167;//日出日落时太阳的位置 蓝调时间 -3 -6
     private final static double UTo = 180.0;//上次计算的日落日出时间，初始迭代值180.0
     private static int[] days_of_month_1 = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     private static int[] days_of_month_2 = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -236,26 +235,6 @@ public class SunRiseSet {
 
     }
 
-//打印结果
-
-// public static void output(double rise, double set, double glong){
-
-//     if((int)(60*(rise/15+Zone(glong)-(int)(rise/15+Zone(glong))))<10)
-
-//         System.out.println("The time at which the sunrise is: "+(int)(rise/15+Zone(glong))+":"+(int)(60*(rise/15+Zone(glong)-(int)(rise/15+Zone(glong))))+" .\n");
-
-//     else System.out.println("The time at which the sunrise is: "+(int)(rise/15+Zone(glong))+":"+(int)(60*(rise/15+Zone(glong)-(int)(rise/15+Zone(glong))))+" .\n");
-
-//
-
-//     if((int)(60*(set/15+Zone(glong)-(int)(set/15+Zone(glong))))<10)
-
-//         System.out.println("The time at which the sunset is: "+(int)(set/15+Zone(glong))+": "+(int)(60*(set/15+Zone(glong)-(int)(set/15+Zone(glong))))+" .\n");
-
-//     else System.out.println("The time at which the sunset is: "+(int)(set/15+Zone(glong))+":"+(int)(60*(set/15+Zone(glong)-(int)(set/15+Zone(glong))))+" .\n");
-
-// }
-
     public static String getSunrise(BigDecimal longitude, BigDecimal latitude, Date sunTime) {
         if (sunTime != null && longitude != null && latitude != null) {
             double sunrise, glong, glat;
@@ -344,11 +323,6 @@ public class SunRiseSet {
 
                                     G_sun(t_century(days(year, month, date), UTo)))))), UTo, glong, glat, year, month, date);
 
-//System.out.println("The time at which the sunset is: "+(int)(sunset/15+Zone(glong))+":"+(int)(60*(sunset/15+Zone(glong)-(int)(sunset/15+Zone(glong))))+" .\n");
-
-//        Log.d("Sunset", "Sunset is: "+(int)(sunset/15+8)+":"+(int)(60*(sunset/15+8-(int)(sunset/15+8)))+" .\n");
-
-            //return "Sunset is: "+(int)(sunset/15+Zone(glong))+":"+(int)(60*(sunset/15+Zone(glong)-(int)(sunset/15+Zone(glong))))+" .\n";
 
             return (int) (sunset / 15 + 8) + ":" + (int) (60 * (sunset / 15 + 8 - (int) (sunset / 15 + 8))) + ":00";
         }
@@ -356,25 +330,14 @@ public class SunRiseSet {
     }
 
     public static void main(String[] args) {
-        String str1 = SunRiseSet.getSunrise(new BigDecimal("118.916794"), new BigDecimal("27.412366"), new Date());
-        String str2 = SunRiseSet.getSunset(new BigDecimal("118.916794"), new BigDecimal("27.412366"), new Date());
+        String str1 = SunRiseSet.getSunrise(new BigDecimal("118.916794"), new BigDecimal("27.134285"), new Date());
+        String str2 = SunRiseSet.getSunset(new BigDecimal("118.916794"), new BigDecimal("27.134285"), new Date());
         System.out.println("日出时间：" + str1);
         System.out.println("日落时间：" + str2);
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        try {
-//            Date parse = sdf.parse("2022-03-24");
-//            System.out.println("parse = " + parse.getTime());
-//            System.out.println(parse.getTime() >= new Date().getTime());
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-
-        DateTime parse = DateUtil.parse("2022-03-24 00:00:00", "YY-MM-dd HH:mm:ss");
-        System.out.println("parse.getTime() = " + parse.getTime());
-
-
-//        System.out.println("new.getTime() = " + new Date().getTime());
-//        System.out.println(parse.getTime() > new Date().getTime());
-
+        ChineseDate chineseDate = new ChineseDate(new Date());
+        System.out.println("chineseDate.getChineseDay() = " + chineseDate.getChineseDay());
+        Integer[] days = {12, 13, 14, 15, 16};
+        List<Integer> list = Arrays.asList(days);
+        System.out.println("list = " + list);
     }
 }

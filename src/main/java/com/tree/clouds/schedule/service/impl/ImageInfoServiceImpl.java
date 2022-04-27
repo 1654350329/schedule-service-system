@@ -67,4 +67,9 @@ public class ImageInfoServiceImpl extends ServiceImpl<ImageInfoMapper, ImageInfo
         }
         return this.count(wrapper);
     }
+
+    @Override
+    public List<String> getFilePath(String taskId, String startTime, String endTime) {
+        return this.baseMapper.getFilePath(taskId, startTime, endTime);
+    }
 }
