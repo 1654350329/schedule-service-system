@@ -109,7 +109,7 @@ public class ScheduleTask extends BaseEntity {
     @ApiModelProperty(value = "透明度 0.1 1")
     @TableField("alpha")
     private Float alpha;
-    @ApiModelProperty(value = "y坐标")
+    @ApiModelProperty(value = "图片路径")
     @TableField("images_Path")
     private String imagesPath;
     @ApiModelProperty(value = "水印文字")

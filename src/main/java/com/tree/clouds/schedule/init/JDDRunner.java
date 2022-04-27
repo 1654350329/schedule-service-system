@@ -39,6 +39,7 @@ public class JDDRunner implements ApplicationRunner {
             //预览路径
             Constants.PREVIEW_PATH = Constants.SCHEDULE_PATH + "preview/";
             Constants.WATERMARK_PATH = Constants.SCHEDULE_PATH + "watermark/";
+            Constants.TMP_HOME = Constants.Root_PATH + "/temp/";
         }
         sdk = HCNetSDK.INSTANCE;
         //海康威视名称
@@ -68,6 +69,7 @@ public class JDDRunner implements ApplicationRunner {
         FileUtil.mkdir(Constants.PREVIEW_PATH);
         FileUtil.mkdir(Constants.SCHEDULE_PATH);
         FileUtil.mkdir(Constants.HLS);
+        FileUtil.mkdir(Constants.WATERMARK_PATH);
 
     }
 

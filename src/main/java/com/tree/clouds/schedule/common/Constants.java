@@ -5,13 +5,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Constants {
-    public static final String TMP_HOME = "/temp/";
+
     //存放抓拍任务id
     public static final Map<String, String> scheduleMap = new ConcurrentHashMap<>();
     //存放归档任务id
     public static final Map<String, String> taskMap = new ConcurrentHashMap<>();
     public static final Map<Integer, String> errorMap = new LinkedHashMap<>();
     public static String Root_PATH = "E:\\schedule";
+    public static String TMP_HOME = System.getProperty("java.io.tmpdir");
+    ;
     //抓拍图片存放路径
     public static String SCHEDULE_PATH = Root_PATH + "\\image\\";
     public static String MP4_PATH = Root_PATH + "\\MP4\\";
