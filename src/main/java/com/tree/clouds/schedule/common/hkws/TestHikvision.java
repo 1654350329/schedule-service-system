@@ -110,6 +110,7 @@ public class TestHikvision implements Task {
             File file = new File(fileName);
 //             抓图到内存，单帧数据捕获并保存成JPEG存放在指定的内存空间中
 //            需要加入通道
+            String dateTime = DateUtil.formatDateTime(new Date());
             boolean is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                     jpegBuffer, 1024 * 1024 * 5, byReference);
             System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]");
@@ -127,7 +128,7 @@ public class TestHikvision implements Task {
                 deviceLogService.saveLog(cameraInfo.getDeviceId(), sdk.NET_DVR_GetLastError(), false);
                 return;
             }
-            String dateTime = DateUtil.formatDateTime(new Date());
+
             // 存储本地，写入内容
             makeFile(byReference, jpegBuffer, file);
             //添加文字水印
@@ -144,6 +145,7 @@ public class TestHikvision implements Task {
             }
             //添加图片水印
             if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 1) {
+                log.warn("添加图片水印：" + Constants.Root_PATH + scheduleTask.getImagesPath());
                 ImgUtil.pressImage(
                         FileUtil.file(file.getAbsolutePath()),
                         FileUtil.file(file.getAbsolutePath()),
@@ -200,6 +202,7 @@ public class TestHikvision implements Task {
         getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);
 
     }
+
 
     private static void makeFile(IntByReference byReference, ByteBuffer jpegBuffer, File file) {
         BufferedOutputStream outputStream = null;
