@@ -114,10 +114,7 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         cameraInfo.setCreatUser(task.getCreatedUser());
         //抓拍1小时
         TestHikvision testHikvision = null;
-        if (task.getTaskType() == 0) {
-            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
-        }
-        if (task.getTaskType() == 1) {
+        if (task.getTaskType() == 0 || task.getTaskType() == 1) {
             testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
         }
         if (task.getTaskType() == 2 || task.getTaskType() == 7) {
@@ -197,6 +194,11 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
 
     @Override
     public Boolean stopSchedule(String scheduleId) {
+        ScheduleTask scheduleTask = scheduleTaskService.getById(scheduleId);
+        //移除抓拍每日执行任务
+        if (scheduleTask.getScheduleNumber() != null) {
+            CronUtil.remove(scheduleTask.getScheduleNumber());
+        }
         List<DeviceSchedule> tasks = getByScheduleId(scheduleId);
         for (DeviceSchedule task : tasks) {
             //移除抓拍任务

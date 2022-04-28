@@ -39,5 +39,5 @@ public class BaseEntity implements Serializable {
     @ExcelIgnore
     @ApiModelProperty(value = "删除")
     @TableField(fill = FieldFill.INSERT, value = DEL)
-    public int del;
+    public Integer del;
 }

@@ -192,7 +192,7 @@ public class Move extends Base implements Task {
     public static synchronized void executeCmd(String sourcePath, Integer fps, String outPath, String musicPath) {
         System.out.println("开始执行生成视频" + outPath);
         long startTime = System.currentTimeMillis();
-        if (fps == 0) {
+        if (fps == null || fps == 0) {
             fps = 24;
         }
         double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
@@ -373,7 +373,7 @@ public class Move extends Base implements Task {
                     while (err.available() > 0) {
                         c = new Character((char) err.read());
                         stringBuilder.append(c);
-                        System.out.print(stringBuilder);
+                        System.out.print(c);
                     }
 
                     exitValue = p.exitValue();

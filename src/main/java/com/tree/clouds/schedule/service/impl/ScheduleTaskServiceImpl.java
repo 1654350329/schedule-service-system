@@ -161,12 +161,12 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
         if (scheduleTask.getTaskType() == 0) {
             //执行时间
             String date = scheduleTask.getStartDate();
-            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 03:30:00");
+            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 04:20:00");
             if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDate(new Date());
+                date = DateUtil.formatDate(new Date(new Date().getTime() + 1000 * 5));
             }
-            String[] dates = date.split("-");
-            String schedulingPattern = String.format("0 0 4 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
+            String[] dates = date.replace(" ", "-").replace(":", "_").split("-");
+            String schedulingPattern = String.format("%s %s %s %s/1 %s ? %s", dates[5], dates[4], dates[3], dates[2], dates[1], dates[0]);
             SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
             schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
             log.info("日出计划schedulingPattern = " + schedulingPattern);
@@ -177,10 +177,10 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             String date = scheduleTask.getStartDate();
             DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 16:28:00");
             if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDate(new Date());
+                date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
             }
-            String[] dates = date.split("-");
-            String schedulingPattern = String.format("0 30 16 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
+            String[] dates = date.replace(" ", "-").replace(":", "_").split("-");
+            String schedulingPattern = String.format("%s %s %s %s/1 %s ? %s", dates[5], dates[4], dates[3], dates[2], dates[1], dates[0]);
             SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
             schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
             log.info("日落计划schedulingPattern = " + schedulingPattern);

@@ -777,6 +777,10 @@ public interface HCNetSDK extends StdCallLibrary {
 
     boolean NET_DVR_SetDVRMessageCallBack(FMessageCallBack fMessageCallBack, int dwUser);
 
+    /****************************ATM(end)***************************/
+
+    boolean NET_DVR_SetVoiceComClientVolume(NativeLong lVoiceComHandle, short wVolume);
+
     boolean NET_DVR_SetDVRMessageCallBack_V30(FMSGCallBack fMessageCallBack, Pointer pUser);
 
     boolean NET_DVR_SetConnectTime(int dwWaitTime, int dwTryTimes);
@@ -803,15 +807,18 @@ public interface HCNetSDK extends StdCallLibrary {
 
     boolean NET_DVR_Logout(NativeLong lUserID);
 
-    boolean NET_DVR_Logout_V30(NativeLong lUserID);
-
     ;
+
+    boolean NET_DVR_Logout_V30(NativeLong lUserID);
 
     int NET_DVR_GetLastError();
 
     String NET_DVR_GetErrorMsg(NativeLongByReference pErrorNo);
 
     boolean NET_DVR_SetShowMode(int dwShowType, int colorKey);
+
+    //语音转发
+    NativeLong NET_DVR_StartVoiceCom_MR(NativeLong lUserID, FVoiceDataCallBack_MR fVoiceDataCallBack, int dwUser);
 
     boolean NET_DVR_GetDVRIPByResolveSvr(String sServerIP, short wServerPort, String sDVRName, short wDVRNameLen, String sDVRSerialNumber, short wDVRSerialLen, String sGetIP);
 
@@ -988,14 +995,18 @@ public interface HCNetSDK extends StdCallLibrary {
 
     NativeLong NET_DVR_StartVoiceCom_V30(NativeLong lUserID, int dwVoiceChan, boolean bNeedCBNoEncData, FVoiceDataCallBack_V30 fVoiceDataCallBack, Pointer pUser);
 
-    boolean NET_DVR_SetVoiceComClientVolume(NativeLong lVoiceComHandle, short wVolume);
+    /************************************多路解码器(end)***************************************/
+
+    boolean NET_DVR_GetScaleCFG(NativeLong lUserID, IntByReference lpOutScale);
 
     boolean NET_DVR_StopVoiceCom(NativeLong lVoiceComHandle);
 
-    /****************************ATM(end)***************************/
-
-//语音转发
-    NativeLong NET_DVR_StartVoiceCom_MR(NativeLong lUserID, FVoiceDataCallBack_MR fVoiceDataCallBack, int dwUser);
+    public static class NET_DVR_PPPOECFG extends Structure {//PPPoe
+        public int dwPPPoE;
+        public byte[] sPPPoEUser = new byte[32];
+        public byte[] sPPPoEPassword = new byte[16];
+        public NET_DVR_IPADDR struPPPoEIP;
+    }
 
     NativeLong NET_DVR_StartVoiceCom_MR_V30(NativeLong lUserID, int dwVoiceChan, FVoiceDataCallBack_MR_V30 fVoiceDataCallBack, Pointer pUser);
 
@@ -1073,11 +1084,11 @@ public interface HCNetSDK extends StdCallLibrary {
     boolean NET_DVR_OpenSound_Card(NativeLong lRealHandle);
 
     boolean NET_DVR_CloseSound_Card(NativeLong lRealHandle);
+//end 2007-12-13 modified by zxy
 
     boolean NET_DVR_SetVolume_Card(NativeLong lRealHandle, short wVolume);
 
     boolean NET_DVR_AudioPreview_Card(NativeLong lRealHandle, boolean bEnable);
-//end 2007-12-13 modified by zxy
 
     NativeLong NET_DVR_GetCardLastError_Card();
 
@@ -1119,11 +1130,16 @@ public interface HCNetSDK extends StdCallLibrary {
     //2006-08-28 704-640 缩放配置
     boolean NET_DVR_SetScaleCFG(NativeLong lUserID, int dwScale);
 
-    boolean NET_DVR_GetScaleCFG(NativeLong lUserID, IntByReference lpOutScale);
+    //通道压缩参数(9000扩展)
+    public static class NET_DVR_COMPRESSIONCFG_V30 extends Structure {
+        public int dwSize;
+        public NET_DVR_COMPRESSION_INFO_V30 struNormHighRecordPara;    //录像 对应8000的普通
+        public NET_DVR_COMPRESSION_INFO_V30 struRes;   //保留 String[28];
+        public NET_DVR_COMPRESSION_INFO_V30 struEventRecordPara;       //事件触发压缩参数
+        public NET_DVR_COMPRESSION_INFO_V30 struNetPara;               //网传(子码流)
+    }
 
     boolean NET_DVR_SetScaleCFG_V30(NativeLong lUserID, NET_DVR_SCALECFG pScalecfg);
-
-    /************************************多路解码器(end)***************************************/
 
     boolean NET_DVR_GetScaleCFG_V30(NativeLong lUserID, NET_DVR_SCALECFG pScalecfg);
 
@@ -1143,7 +1159,11 @@ public interface HCNetSDK extends StdCallLibrary {
 
     boolean NET_DVR_PTZSelZoomIn(NativeLong lRealHandle, NET_DVR_POINT_FRAME pStruPointFrame);
 
+    ;
+
     boolean NET_DVR_PTZSelZoomIn_EX(NativeLong lUserID, NativeLong lChannel, NET_DVR_POINT_FRAME pStruPointFrame);
+
+    ;
 
     //解码设备DS-6001D/DS-6001F
     boolean NET_DVR_StartDecode(NativeLong lUserID, NativeLong lChannel, NET_DVR_DECODERINFO lpDecoderinfo);
@@ -1152,11 +1172,7 @@ public interface HCNetSDK extends StdCallLibrary {
 
     boolean NET_DVR_StopDecode(NativeLong lUserID, NativeLong lChannel);
 
-    ;
-
     boolean NET_DVR_GetDecoderState(NativeLong lUserID, NativeLong lChannel, NET_DVR_DECODERSTATE lpDecoderState);
-
-    ;
 
     //2005-08-01
     boolean NET_DVR_SetDecInfo(NativeLong lUserID, NativeLong lChannel, NET_DVR_DECCFG lpDecoderinfo);
@@ -1364,18 +1380,23 @@ public interface HCNetSDK extends StdCallLibrary {
     public static interface FPlayDataCallBack extends StdCallCallback {
         public void invoke(NativeLong lPlayHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, int dwUser);
     }
+
     public static interface FVoiceDataCallBack extends StdCallCallback {
         public void invoke(NativeLong lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
     }
+
     public static interface FVoiceDataCallBack_V30 extends StdCallCallback {
         public void invoke(NativeLong lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser);
     }
+
     public static interface FVoiceDataCallBack_MR extends StdCallCallback {
         public void invoke(NativeLong lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, int dwUser);
     }
+
     public static interface FVoiceDataCallBack_MR_V30 extends StdCallCallback {
         public void invoke(NativeLong lVoiceComHandle, String pRecvDataBuffer, int dwBufSize, byte byAudioFlag, String pUser);
     }
+
     public static interface FVoiceDataCallBack2 extends StdCallCallback {
         public void invoke(String pRecvDataBuffer, int dwBufSize, Pointer pUser);
     }
@@ -1512,13 +1533,6 @@ public interface HCNetSDK extends StdCallLibrary {
         public int dwNetInterface;               //网络接口 1-10MBase-T 2-10MBase-T全双工 3-100MBase-TX 4-100M全双工 5-10M/100M自适应
         public short wDVRPort;                        //端口号
         public byte[] byMACAddr = new byte[MACADDR_LEN];        //服务器的物理地址
-    }
-
-    public static class NET_DVR_PPPOECFG extends Structure {//PPPoe
-        public int dwPPPoE;
-        public byte[] sPPPoEUser = new byte[32];
-        public byte[] sPPPoEPassword = new byte[16];
-        public NET_DVR_IPADDR struPPPoEIP;
     }
 
     public static class NET_DVR_NETCFG_V30 extends Structure {
@@ -1764,15 +1778,6 @@ public interface HCNetSDK extends StdCallLibrary {
         public byte byVideoEncType;//视频编码类型 0 hik264;1标准h264; 2标准mpeg4;
         public byte byAudioEncType;//音频编码类型 0 G722
         public byte[] byres = new byte[10];
-    }
-
-    //通道压缩参数(9000扩展)
-    public static class NET_DVR_COMPRESSIONCFG_V30 extends Structure {
-        public int dwSize;
-        public NET_DVR_COMPRESSION_INFO_V30 struNormHighRecordPara;    //录像 对应8000的普通
-        public NET_DVR_COMPRESSION_INFO_V30 struRes;   //保留 String[28];
-        public NET_DVR_COMPRESSION_INFO_V30 struEventRecordPara;       //事件触发压缩参数
-        public NET_DVR_COMPRESSION_INFO_V30 struNetPara;               //网传(子码流)
     }
 
     public static class NET_DVR_COMPRESSION_INFO extends Structure {//码流压缩参数(子结构)

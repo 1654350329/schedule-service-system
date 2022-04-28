@@ -110,15 +110,15 @@ public class TestHikvision implements Task {
             File file = new File(fileName);
 //             抓图到内存，单帧数据捕获并保存成JPEG存放在指定的内存空间中
 //            需要加入通道
-            String dateTime = DateUtil.formatDateTime(new Date());
+            String dateTime = DateUtil.formatDateTime(new Date(new Date().getTime() - 1000 * 10));
             boolean is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                     jpegBuffer, 1024 * 1024 * 5, byReference);
             System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]");
-
             while (!is && (sdk.NET_DVR_GetLastError() == 9 || sdk.NET_DVR_GetLastError() == 10)) {
                 is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                         jpegBuffer, 1024 * 1024 * 5, byReference);
             }
+
             if (!is) {
                 cameraInfo.setStatus(false);
                 cameraInfo.setErrorCode(sdk.NET_DVR_GetLastError());

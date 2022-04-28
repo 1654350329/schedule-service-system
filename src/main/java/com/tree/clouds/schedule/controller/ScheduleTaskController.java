@@ -118,6 +118,9 @@ public class ScheduleTaskController {
                 throw new BaseBusinessException(400, "请先添加设备!");
             }
             ScheduleTask scheduleTask = this.scheduleTaskService.getById(id);
+            if (scheduleTask.getScheduleStatus() == 1) {
+                scheduleTaskService.stopSchedule(id);
+            }
             if (scheduleTask.getTaskType() == 0) {
                 scheduleTask.setEndTime("08:00:00");
             }
