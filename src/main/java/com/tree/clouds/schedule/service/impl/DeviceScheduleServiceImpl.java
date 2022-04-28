@@ -120,10 +120,9 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         if (task.getTaskType() == 2 || task.getTaskType() == 7) {
             //自定义时间 需指定任务结束日期
             testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
-            CronUtil.remove(task.getScheduleNumber());
         }
-        //月满计划
-        if (task.getTaskType() == 3) {
+        //月满计划与黑夜计划与白天计划
+        if (task.getTaskType() == 3 || task.getTaskType() == 6 || task.getTaskType() == 4) {
             //自定义时间 需指定任务结束日期
             testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
         }
@@ -148,11 +147,13 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
             musicPath = musicManageService.getById(scheduleTask.getMusicId()).getFilePath();
         }
         String cron = null;
-        if (scheduleTask.getTaskType() == 0 && scheduleTask.getCycle() == 0) {
+        //日出计划 与黑夜计划归档时间
+        if ((scheduleTask.getTaskType() == 0 || scheduleTask.getTaskType() == 6) && scheduleTask.getCycle() == 0) {
             cron = "0 0 8 */1 * ? *";
         }
-        if (scheduleTask.getTaskType() == 1 && scheduleTask.getCycle() == 0) {
-            cron = "0 0 19 */1 * ? *";
+        //日落计划 与白天计划归档时间
+        if ((scheduleTask.getTaskType() == 1 || scheduleTask.getTaskType() == 4) && scheduleTask.getCycle() == 0) {
+            cron = "0 0 20 */1 * ? *";
         }
         if (scheduleTask.getTaskType() == 2 && scheduleTask.getCycle() == 0) {
             cron = "0 0 1 */1 * ? *";

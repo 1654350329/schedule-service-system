@@ -24,15 +24,11 @@ import lombok.EqualsAndHashCode;
 public class ScheduleTask extends BaseEntity {
 
     public static final String SCHEDULE_ID = "schedule_id";
-
+    public static final String SCHEDULE_NAME = "schedule_name";
     public static final String START_TIME = "start_time";
-
     public static final String END_TIME = "end_time";
-
     public static final String CYCLE = "cycle";
-
     public static final String FREQUENCY = "frequency";
-
     public static final String CODE_RATE = "code_rate";
     public static final String SCHEDULE_STATUS = "schedule_status";
     public static final Integer STATUS_TRUE = 1;
@@ -47,7 +43,7 @@ public class ScheduleTask extends BaseEntity {
     @TableField(value = "schedule_name")
     private String scheduleName;
 
-    @ApiModelProperty(value = "任务类型 0 日出 1日落 2自定义")
+    @ApiModelProperty(value = "任务类型 0 日出 1日落 2自定义 3满月计划 4白天计划 6黑夜计划 7满月计划")
     @TableField("task_type")
     private Integer taskType;
 

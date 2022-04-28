@@ -83,16 +83,45 @@ public class SumRiseSetTask implements Task {
                 deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, dateTime.getTime());
             }
             //月满计划
-            else if (scheduleTask.getTaskType() == 3) {
-                String[] days = {"十二", "十三", "十四", "十五", "十六"};
-                List<String> list = Arrays.asList(days);
-                //判断是否是月满
-                ChineseDate chineseDate = new ChineseDate(new Date());
-                if (!list.contains(chineseDate.getChineseDay())) {
-                    System.out.println("chineseDate = " + chineseDate);
-                    log.info(scheduleTask.getScheduleName() + "当前不是满月时间");
-                    return;
+            else if (scheduleTask.getTaskType() == 3 || scheduleTask.getTaskType() == 6) {
+                if (scheduleTask.getTaskType() == 3) {
+                    String[] days = {"十二", "十三", "十四", "十五", "十六"};
+                    List<String> list = Arrays.asList(days);
+                    //判断是否是月满
+                    ChineseDate chineseDate = new ChineseDate(new Date());
+                    if (!list.contains(chineseDate.getChineseDay())) {
+                        System.out.println("chineseDate = " + chineseDate);
+                        log.info(scheduleTask.getScheduleName() + "当前不是满月时间");
+                        return;
+                    }
                 }
+                startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                String[] split = startTime.split(":");
+                String scheduleCycle = null;
+                try {
+                    if (scheduleTask.getFrequencyUnit() == 0) {
+                        scheduleCycle = String.format("*/%s * * * * ? *", scheduleTask.getFrequency());
+                    }
+                    if (scheduleTask.getFrequencyUnit() == 1) {
+                        scheduleCycle = String.format("%s */%s * * * ? *", split[2], scheduleTask.getFrequency());
+                    }
+                    if (scheduleTask.getFrequencyUnit() == 2) {
+                        scheduleCycle = String.format("%s %s */%s * * ? *", split[2], split[1], scheduleTask.getFrequency());
+                    }
+                    startTime = (DateUtil.formatDate(new Date()) + " " + startTime);
+                    DateTime dateTime = DateUtil.parseDateTime(startTime);
+                    while (new Date().getTime() < dateTime.getTime()) {
+                        System.out.println(" 等等执行" + deviceInfo);
+                        Thread.currentThread().sleep(1000 * 30);
+                    }
+                    //获取第二天的日出蓝调时间
+                    String endTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), DateUtil.tomorrow());
+                    DateTime time = DateUtil.parseDateTime(DateUtil.tomorrow() + " " + endTime);
+                    deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, time.getTime());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else if (scheduleTask.getTaskType() == 4) {
                 startTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
                 String[] split = startTime.split(":");
                 String scheduleCycle = null;
@@ -112,9 +141,9 @@ public class SumRiseSetTask implements Task {
                         System.out.println(" 等等执行" + deviceInfo);
                         Thread.currentThread().sleep(1000 * 30);
                     }
-                    //获取第二天的日出两调时间
-                    String endTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), DateUtil.tomorrow());
-                    DateTime time = DateUtil.parseDateTime(DateUtil.tomorrow() + " " + endTime);
+                    //获取第二天的日出蓝调时间
+                    String endTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                    DateTime time = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + endTime);
                     deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, time.getTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -49,6 +49,19 @@ public class TestHikvision implements Task {
         this.imageInfoService = imageInfoService;
     }
 
+    public void execute() {
+        if (endTime != null) {
+            DateTime parse = DateUtil.parseDateTime(endTime);
+            if (new Date().getTime() > parse.getTime()) {
+                CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
+                Constants.scheduleMap.remove(cameraInfo.getTaskId());
+                return;
+            }
+        }
+        getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);
+
+    }
+
     //抓拍图片
     public static void getDVRPic(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
 
@@ -190,18 +203,7 @@ public class TestHikvision implements Task {
         }
     }
 
-    public void execute() {
-        if (endTime != null) {
-            DateTime parse = DateUtil.parse(endTime, "yyyy-MM-dd HH:mm:ss");
-            if (new Date().getTime() > parse.getTime()) {
-                CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
-                Constants.scheduleMap.remove(cameraInfo.getTaskId());
-                return;
-            }
-        }
-        getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);
 
-    }
 
 
     private static void makeFile(IntByReference byReference, ByteBuffer jpegBuffer, File file) {

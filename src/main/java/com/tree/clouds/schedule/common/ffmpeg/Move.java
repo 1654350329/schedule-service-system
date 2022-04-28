@@ -59,7 +59,7 @@ public class Move extends Base implements Task {
         List<String> sourcePaths = new ArrayList<>();
         String sourcePath = Constants.SCHEDULE_PATH + taskId + File.separator;
         String playPeriod = null;
-        if (scheduleTask != null && (scheduleTask.getTaskType() == 7 || scheduleTask.getTaskType() == 3)) {
+        if (scheduleTask != null && (scheduleTask.getTaskType() == 7 || scheduleTask.getTaskType() == 3 || scheduleTask.getTaskType() == 6)) {
             String startTime = null;
             String endTime = null;
             if (scheduleTask.getTaskType() == 7) {
@@ -67,7 +67,7 @@ public class Move extends Base implements Task {
                 endTime = DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime();
 
             }
-            if (scheduleTask.getTaskType() == 3) {
+            if (scheduleTask.getTaskType() == 3 || scheduleTask.getTaskType() == 6) {
                 startTime = DateUtil.formatDate(DateUtil.yesterday()) + " " + "16:00:00";
                 endTime = DateUtil.formatDate(new Date()) + " " + "8:00:00";
             }

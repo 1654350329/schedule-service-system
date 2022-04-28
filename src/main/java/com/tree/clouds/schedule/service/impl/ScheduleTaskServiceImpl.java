@@ -20,7 +20,7 @@ import com.tree.clouds.schedule.model.vo.DeviceScheduleVO;
 import com.tree.clouds.schedule.model.vo.ScheduleTaskPageVO;
 import com.tree.clouds.schedule.model.vo.ScheduleTaskVO;
 import com.tree.clouds.schedule.service.*;
-import com.tree.clouds.schedule.task.SumRiseSetTask;
+import com.tree.clouds.schedule.task.TaskSchedule;
 import com.tree.clouds.schedule.utils.BaseBusinessException;
 import com.tree.clouds.schedule.utils.LoginUserUtil;
 import com.tree.clouds.schedule.utils.MultipartFileUtil;
@@ -89,11 +89,19 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
         if (task.getScheduleStatus() != null && task.getScheduleStatus() == 1) {
             throw new BaseBusinessException(400, "任务已开启,请先停止任务!");
         }
+        ScheduleTask one = this.getOne(new QueryWrapper<ScheduleTask>().eq(ScheduleTask.SCHEDULE_NAME, scheduleTaskVO.getScheduleName()));
+        if (one != null) {
+            throw new BaseBusinessException(400, "计划任务名称已存在");
+        }
         this.updateById(scheduleTask);
     }
 
     @Override
     public void addSchedule(ScheduleTaskVO scheduleTaskVO) {
+        ScheduleTask one = this.getOne(new QueryWrapper<ScheduleTask>().eq(ScheduleTask.SCHEDULE_NAME, scheduleTaskVO.getScheduleName()));
+        if (one != null) {
+            throw new BaseBusinessException(400, "计划任务名称已存在");
+        }
         ScheduleTask scheduleTask = BeanUtil.toBean(scheduleTaskVO, ScheduleTask.class);
         scheduleTask.setScheduleStatus(0);
         this.save(scheduleTask);
@@ -150,83 +158,17 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
     @Override
     public void startSchedule(String scheduleId) {
         ScheduleTask scheduleTask = this.getById(scheduleId);
-        //开启归档任务
-        deviceScheduleService.archiveTask(scheduleTask);
-        String dateTime = scheduleTask.getEndDate() + " " + scheduleTask.getEndTime() + ":59:59";
-        if (new Date().getTime() > DateUtil.parseDateTime(dateTime).getTime()) {
-            return;
+        String date = scheduleTask.getStartDate() + " 00:00:00";
+        DateTime parseDate = DateUtil.parseDateTime(date);
+        if (parseDate.getTime() <= new Date().getTime()) {
+            date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
         }
-        String schedule = null;
-        //日出
-        if (scheduleTask.getTaskType() == 0) {
-            //执行时间
-            String date = scheduleTask.getStartDate();
-            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 04:20:00");
-            if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDate(new Date(new Date().getTime() + 1000 * 5));
-            }
-            String[] dates = date.replace(" ", "-").replace(":", "_").split("-");
-            String schedulingPattern = String.format("%s %s %s %s/1 %s ? %s", dates[5], dates[4], dates[3], dates[2], dates[1], dates[0]);
-            SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
-            schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
-            log.info("日出计划schedulingPattern = " + schedulingPattern);
-        }
-        //日落
-        if (scheduleTask.getTaskType() == 1) {
-            //执行时间
-            String date = scheduleTask.getStartDate();
-            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 16:28:00");
-            if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
-            }
-            String[] dates = date.replace(" ", "-").replace(":", "_").split("-");
-            String schedulingPattern = String.format("%s %s %s %s/1 %s ? %s", dates[5], dates[4], dates[3], dates[2], dates[1], dates[0]);
-            SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
-            schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
-            log.info("日落计划schedulingPattern = " + schedulingPattern);
-        }
-        //自定义时间
-        if (scheduleTask.getTaskType() == 2 || scheduleTask.getTaskType() == 7) {
-            //执行时间
-            String date = scheduleTask.getStartDate() + " " + scheduleTask.getStartTime();
-            DateTime parseDate = DateUtil.parseDateTime(date);
-            date = DateUtil.formatDateTime(new Date(parseDate.getTime() - 1000 * 30));
-            if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
-            }
-            String[] dates = date.replace(" ", "-").replaceAll(":", "-").split("-");
-            String schedulingPattern = String.format("%s %s %s %s/1 %s ? %s", dates[5], dates[4], dates[3], dates[2], dates[1], dates[0]);
-            SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
-            schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
-            log.info("自定义计划schedulingPattern = " + schedulingPattern);
-        }
-        //满月计划
-        if (scheduleTask.getTaskType() == 3) {
-            //执行时间
-            String date = scheduleTask.getStartDate();
-            DateTime parseDate = DateUtil.parseDateTime(scheduleTask.getStartDate() + " 16:28:00");
-            if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDate(new Date());
-            }
-            String[] dates = date.split("-");
-            String schedulingPattern = String.format("0 51 15 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
-//            String schedulingPattern = String.format("0 30 16 %s/1 %s ? %s", dates[2], dates[1], dates[0]);
-            SumRiseSetTask sumRiseSetTask = new SumRiseSetTask(scheduleTask, deviceScheduleService, deviceInfoService);
-            schedule = CronUtil.schedule(schedulingPattern, sumRiseSetTask);
-            log.info("满月计划schedulingPattern = " + schedulingPattern);
-        }
-        if (!CronUtil.getScheduler().isStarted()) {
-            // 支持秒级别定时任务
-            CronUtil.setMatchSecond(true);
-            CronUtil.start();
-        }
-        //更新状态
-        ScheduleTask task = new ScheduleTask();
-        task.setScheduleId(scheduleId);
-        task.setScheduleNumber(schedule);
-        task.setScheduleStatus(ScheduleTask.STATUS_TRUE);
-
-        this.updateById(task);
+        String[] dates = date.replace(" ", "-").replace(":", "-").split("-");
+        String schedulingPattern = String.format("%s %s %s %s/1 %s ? %s", dates[5], dates[4], dates[3], dates[2], dates[1], dates[0]);
+        TaskSchedule taskSchedule = new TaskSchedule(scheduleTask, this, deviceScheduleService, deviceInfoService);
+        log.info("首次执行计划:" + scheduleTask + schedulingPattern);
+        String schedule = CronUtil.schedule(schedulingPattern, taskSchedule);
+        Constants.tempMap.put(scheduleId, schedule);
     }
 
     @Override

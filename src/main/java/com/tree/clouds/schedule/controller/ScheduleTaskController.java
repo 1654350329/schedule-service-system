@@ -81,6 +81,10 @@ public class ScheduleTaskController {
     @Log("新增计划配置查询")
     @PreAuthorize("hasAuthority('login:log:list')")
     public RestResponse<Boolean> addSchedule(@RequestBody ScheduleTaskVO scheduleTaskVO) {
+        if (DateUtil.parseTime(scheduleTaskVO.getEndTime()).getTime() < DateUtil.parseTime(scheduleTaskVO.getStartTime()).getTime()) {
+            //跨夜计划
+            scheduleTaskVO.setTaskType(7);
+        }
         scheduleTaskService.addSchedule(scheduleTaskVO);
         return RestResponse.ok(true);
     }
@@ -94,6 +98,7 @@ public class ScheduleTaskController {
             //跨夜计划
             scheduleTaskVO.setTaskType(7);
         }
+
         scheduleTaskService.updateSchedule(scheduleTaskVO);
         return RestResponse.ok(true);
     }
@@ -121,13 +126,7 @@ public class ScheduleTaskController {
             if (scheduleTask.getScheduleStatus() == 1) {
                 scheduleTaskService.stopSchedule(id);
             }
-            if (scheduleTask.getTaskType() == 0) {
-                scheduleTask.setEndTime("08:00:00");
-            }
-            if (scheduleTask.getTaskType() == 1) {
-                scheduleTask.setEndTime("19:30:00");
-            }
-            String dateTime = scheduleTask.getEndDate() + " " + scheduleTask.getEndTime();
+            String dateTime = scheduleTask.getEndDate() + " 23:59:59";
             if (new Date().getTime() > DateUtil.parseDateTime(dateTime).getTime()) {
                 throw new BaseBusinessException(400, "执行任务时间已结束!请重新编辑");
             }

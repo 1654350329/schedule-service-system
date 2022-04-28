@@ -10,6 +10,8 @@ public class Constants {
     public static final Map<String, String> scheduleMap = new ConcurrentHashMap<>();
     //存放归档任务id
     public static final Map<String, String> taskMap = new ConcurrentHashMap<>();
+    //临时执行任务
+    public static final Map<String, String> tempMap = new ConcurrentHashMap<>();
     public static final Map<Integer, String> errorMap = new LinkedHashMap<>();
     public static String Root_PATH = "E:\\schedule";
     public static String TMP_HOME = System.getProperty("java.io.tmpdir");
