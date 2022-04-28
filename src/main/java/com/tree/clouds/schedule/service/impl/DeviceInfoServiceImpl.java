@@ -5,6 +5,7 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tree.clouds.schedule.common.Constants;
 import com.tree.clouds.schedule.common.hkws.MonitorCameraInfo;
 import com.tree.clouds.schedule.common.hkws.TestHikvision;
 import com.tree.clouds.schedule.listener.ExcelListener;
@@ -18,6 +19,7 @@ import com.tree.clouds.schedule.service.DeviceInfoService;
 import com.tree.clouds.schedule.service.DeviceScheduleService;
 import com.tree.clouds.schedule.service.ImageInfoService;
 import com.tree.clouds.schedule.utils.BaseBusinessException;
+import com.tree.clouds.schedule.utils.DownloadFile;
 import com.tree.clouds.schedule.utils.LoginUserUtil;
 import com.tree.clouds.schedule.utils.MultipartFileUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -87,6 +90,9 @@ public class DeviceInfoServiceImpl extends ServiceImpl<DeviceInfoMapper, DeviceI
 
     @Override
     public void addDevice(DeviceInfoVO deviceInfoVO) {
+        if (deviceInfoVO == null) {
+            return;
+        }
         MonitorCameraInfo cameraInfo = new MonitorCameraInfo();
         cameraInfo.setCameraIp(deviceInfoVO.getDeviceAddress());
         cameraInfo.setCameraPort(deviceInfoVO.getPort());
@@ -124,9 +130,40 @@ public class DeviceInfoServiceImpl extends ServiceImpl<DeviceInfoMapper, DeviceI
         }
         //获取数据
         List<DeviceInfoVO> deviceInfos = excelListener.getDatas();
+
         for (DeviceInfoVO deviceInfo : deviceInfos) {
+            if (deviceInfo.getDevicePassword() == null || deviceInfo.getPort() == null || deviceInfo.getDeviceAddress() == null || deviceInfo.getDeviceName() == null || deviceInfo.getDeviceAccount() == null) {
+                throw new BaseBusinessException(400, "请按模板导入,设备名,ip地址,账号,密码,经度,维度不许为空!!");
+            }
+            System.out.println("deviceInfo = " + deviceInfo);
             addDevice(deviceInfo);
         }
+    }
+
+    @Override
+    public void exportDevice(List<String> ids, HttpServletResponse response) {
+        List<DeviceInfoVO> deviceInfoVOS = new ArrayList<>();
+        List<DeviceInfo> deviceInfos = this.listByIds(ids);
+        for (DeviceInfo deviceInfo : deviceInfos) {
+            DeviceInfoVO deviceInfoVO = BeanUtil.toBean(deviceInfo, DeviceInfoVO.class);
+            if (deviceInfo.getDeviceType() == 0) {
+                deviceInfoVO.setDeviceType("枪机");
+            }
+            if (deviceInfo.getDeviceType() == 1) {
+                deviceInfoVO.setDeviceType("球机");
+            }
+            if (deviceInfo.getDeviceType() == 2) {
+                deviceInfoVO.setDeviceType("全景机");
+            }
+            deviceInfoVOS.add(deviceInfoVO);
+        }
+
+        String fileName = "设备信息.xlsx";
+
+        EasyExcel.write(Constants.TMP_HOME + fileName, DeviceInfoVO.class).head(DeviceInfoVO.class).sheet("用户信息")
+                .doWrite(deviceInfoVOS);
+        byte[] bytes = DownloadFile.File2byte(new File(Constants.TMP_HOME + fileName));
+        DownloadFile.downloadFile(bytes, fileName, response, false);
 
     }
 

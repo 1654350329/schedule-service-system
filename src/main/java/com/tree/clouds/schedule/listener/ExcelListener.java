@@ -17,22 +17,17 @@ import java.util.List;
  * @date: 2021/05/07 16:14
  */
 @Component
-public class ExcelListener<T> extends AnalysisEventListener {
+public class ExcelListener<T> extends AnalysisEventListener<T> {
     private static Logger LOGGER = LoggerFactory.getLogger(ExcelListener.class);
     //    private static final int BATCH_COUNT = 10;
     private List<T> datas = new ArrayList<>();
 
     @Override
-    public void invoke(Object data, AnalysisContext context) {
+    public void invoke(T data, AnalysisContext context) {
         LOGGER.info("导入数据{}", JSON.toJSONString(data));
         //数据存储到list，供批量处理
         datas.add((T) data);
-//        // 达到BATCH_COUNT了，需要去存储一次数据库，防止数据几万条数据在内存，容易OOM
-//        if (datas.size() >= BATCH_COUNT) {
-//            // 存储完成清理datas
-//              saveData();
-//            datas.clear();
-//        }
+
     }
 
     public List<T> getDatas() {

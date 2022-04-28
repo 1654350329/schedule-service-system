@@ -4,9 +4,10 @@ package com.tree.clouds.schedule.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tree.clouds.schedule.common.RestResponse;
 import com.tree.clouds.schedule.common.aop.Log;
-import com.tree.clouds.schedule.model.entity.AlbumRecord;
 import com.tree.clouds.schedule.model.entity.DeviceInfo;
-import com.tree.clouds.schedule.model.vo.*;
+import com.tree.clouds.schedule.model.vo.DeviceInfoPageVO;
+import com.tree.clouds.schedule.model.vo.DeviceInfoVO;
+import com.tree.clouds.schedule.model.vo.PublicIdsReqVO;
 import com.tree.clouds.schedule.service.DeviceInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
@@ -55,6 +58,14 @@ public class DeviceInfoController {
     public RestResponse<Boolean> importDevice(@RequestParam("file") MultipartFile file) {
         deviceInfoService.importDevice(file);
         return RestResponse.ok(true);
+    }
+
+    @GetMapping("/exportDevice")
+    @ApiOperation(value = "导出设备")
+    @Log("导出设备")
+    @PreAuthorize("hasAuthority('login:log:list')")
+    public void exportDevice(PublicIdsReqVO publicIdsReqVO, HttpServletResponse response) {
+        deviceInfoService.exportDevice(publicIdsReqVO.getIds(), response);
     }
 
     @PostMapping("/updateDevice")

@@ -1,12 +1,13 @@
 package com.tree.clouds.schedule.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.tree.clouds.schedule.model.entity.DeviceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.tree.clouds.schedule.model.entity.DeviceInfo;
 import com.tree.clouds.schedule.model.vo.DeviceInfoPageVO;
 import com.tree.clouds.schedule.model.vo.DeviceInfoVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ public interface DeviceInfoService extends IService<DeviceInfo> {
 
     void importDevice(MultipartFile file);
 
+    void exportDevice(List<String> ids, HttpServletResponse response);
+
     List<Map<String, Object>> getTypePercentage();
 
     /***
@@ -39,4 +42,6 @@ public interface DeviceInfoService extends IService<DeviceInfo> {
     Integer getDeviceSum();
 
     List<DeviceInfo> getList(int type);
+
+
 }

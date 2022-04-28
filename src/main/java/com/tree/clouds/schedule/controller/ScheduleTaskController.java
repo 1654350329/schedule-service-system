@@ -81,7 +81,7 @@ public class ScheduleTaskController {
     @Log("新增计划配置查询")
     @PreAuthorize("hasAuthority('login:log:list')")
     public RestResponse<Boolean> addSchedule(@RequestBody ScheduleTaskVO scheduleTaskVO) {
-        if (DateUtil.parseTime(scheduleTaskVO.getEndTime()).getTime() < DateUtil.parseTime(scheduleTaskVO.getStartTime()).getTime()) {
+        if (scheduleTaskVO.getTaskType() == 2 && DateUtil.parseTime(scheduleTaskVO.getEndTime()).getTime() < DateUtil.parseTime(scheduleTaskVO.getStartTime()).getTime()) {
             //跨夜计划
             scheduleTaskVO.setTaskType(7);
         }
