@@ -40,6 +40,8 @@ public class ScheduleTaskVO {
     @ApiModelProperty(value = "背景音乐id")
     private String musicId;
 
+    @ApiModelProperty(value = "坐标位置 0自定义 1左上角 2左下角 3右上角 4右下角")
+    private Integer coordinateType;
 
     @ApiModelProperty(value = "水印类型")
     private Integer watermarkType;

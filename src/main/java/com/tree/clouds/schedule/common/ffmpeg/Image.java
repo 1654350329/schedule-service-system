@@ -6,8 +6,13 @@ import com.tree.clouds.schedule.common.ffmpeg.base.Base;
 import com.tree.clouds.schedule.common.ffmpeg.kit.CommonKit;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by feiFan.gou on 2017/8/18 16:26.
@@ -73,15 +78,15 @@ public class Image extends Base {
 
     @Test
     public void test() {
-        ImgUtil.pressText(//
-                FileUtil.file("D:\\123.jpg"), //
-                FileUtil.file("D:\\123.jpg"), //
-                "版权所有", Color.WHITE, //文字
-                new Font("黑体", Font.BOLD, 100), //字体
-                -100, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
-                -100, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
-                0.5f//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
-        );
+//        ImgUtil.pressText(//
+//                FileUtil.file("D:\\123.jpg"), //
+//                FileUtil.file("D:\\123.jpg"), //
+//                "版权所有", Color.WHITE, //文字
+//                new Font("黑体", Font.BOLD, 100), //字体
+//                -100, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+//                -100, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+//                0.5f//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+//        );
 //        ImgUtil.pressImage(
 //                FileUtil.file("D:\\123.jpg"),
 //                FileUtil.file("D:\\12346546.jpg"),
@@ -90,5 +95,33 @@ public class Image extends Base {
 //                -500, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
 //                0.8f
 //        );
+
+        try {
+            //左上角
+            File file = new File("D:\\20220323175524.jpg");
+            BufferedImage sourceImg = ImageIO.read(new FileInputStream(file));
+            int x = (int) (sourceImg.getWidth() / 1.7 - sourceImg.getWidth());
+            int y = (int) (sourceImg.getHeight() / 1.6 - sourceImg.getHeight());
+            System.out.println("y = " + y);
+            System.out.println("x = " + x);
+            //左下角
+            y = (int) (sourceImg.getHeight() - sourceImg.getHeight() / 1.6);
+            //右上角
+            x = (int) (sourceImg.getWidth() - sourceImg.getWidth() / 1.7);
+            //右下角
+            System.out.println(sourceImg.getWidth()); // 源图宽度
+            System.out.println(sourceImg.getHeight()); // 源图高度
+            ImgUtil.pressText(//
+                    FileUtil.file("D:\\20220323175524.jpg"), //
+                    FileUtil.file("D:\\" + new Date().getTime() + ".jpg"), //
+                    "版权所有11", Color.BLACK, //文字
+                    new Font("黑体", Font.BOLD, sourceImg.getHeight() / 15), //字体
+                    x, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                    y, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                    1f//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

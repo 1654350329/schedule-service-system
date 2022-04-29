@@ -102,6 +102,9 @@ public class ScheduleTask extends BaseEntity {
     @ApiModelProperty(value = "y坐标")
     @TableField("y")
     private Integer y;
+    @ApiModelProperty(value = "坐标位置 0自定义 1左上角 2左下角 3右上角 4右下角")
+    @TableField("coordinate_type")
+    private Integer coordinateType;
     @ApiModelProperty(value = "透明度 0.1 1")
     @TableField("alpha")
     private Float alpha;

@@ -13,6 +13,8 @@ import com.tree.clouds.schedule.model.entity.ImageInfo;
 import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.service.DeviceLogService;
 import com.tree.clouds.schedule.service.ImageInfoService;
+import com.tree.clouds.schedule.utils.ImgInfoUtil;
+import com.tree.clouds.schedule.utils.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -108,7 +110,12 @@ public class TestHikvision implements Task {
             File file = new File(fileName);
 //             抓图到内存，单帧数据捕获并保存成JPEG存放在指定的内存空间中
 //            需要加入通道
-            String dateTime = DateUtil.formatDateTime(new Date());
+            String dateTime;
+            if (SystemUtil.getSystemByName().equalsIgnoreCase("Linux")) {
+                dateTime = DateUtil.formatDateTime(new Date());
+            } else {
+                dateTime = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 10));
+            }
             boolean is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                     jpegBuffer, 1024 * 1024 * 5, byReference);
             System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]" + filePath);
@@ -130,28 +137,38 @@ public class TestHikvision implements Task {
             // 存储本地，写入内容
             makeFile(byReference, jpegBuffer, file);
             //添加文字水印
-            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 1) {
-                ImgUtil.pressText(//
-                        FileUtil.file(file.getAbsolutePath()), //
-                        FileUtil.file(file.getAbsolutePath()), //
-                        scheduleTask.getWatermarkText(), Color.WHITE, //文字
-                        new Font("黑体", Font.BOLD, 100), //字体
-                        scheduleTask.getX(), //x坐标修正值。 默认在中间，偏移量相对于中间偏移
-                        scheduleTask.getY(), //y坐标修正值。 默认在中间，偏移量相对于中间偏移
-                        scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
-                );
-            }
-            //添加图片水印
-            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() == 2) {
-                log.warn("添加图片水印：" + Constants.Root_PATH + scheduleTask.getImagesPath());
-                ImgUtil.pressImage(
-                        FileUtil.file(file.getAbsolutePath()),
-                        FileUtil.file(file.getAbsolutePath()),
-                        ImgUtil.read(FileUtil.file(Constants.Root_PATH + scheduleTask.getImagesPath())), //水印图片
-                        scheduleTask.getX(), //x坐标修正值。 默认在中间，偏移量相对于中间偏移
-                        scheduleTask.getY(), //y坐标修正值。 默认在中间，偏移量相对于中间偏移
-                        scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
-                );
+            if (scheduleTask.getWatermarkType() != null && scheduleTask.getWatermarkType() != 0) {
+                int x;
+                int y;
+                if (scheduleTask.getCoordinateType() == 0) {
+                    x = scheduleTask.getX();
+                    y = scheduleTask.getY();
+                } else {
+                    Map<String, Integer> topLeftInfo = ImgInfoUtil.getInfo(file, scheduleTask.getCoordinateType());
+                    x = topLeftInfo.get("x");
+                    y = topLeftInfo.get("y");
+                }
+                if (scheduleTask.getWatermarkType() == 1) {
+                    ImgUtil.pressText(//
+                            FileUtil.file(file.getAbsolutePath()), //
+                            FileUtil.file(file.getAbsolutePath()), //
+                            scheduleTask.getWatermarkText(), Color.RED, //文字
+                            new Font("黑体", Font.BOLD, 100), //字体
+                            x, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                            y, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                            scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+                    );
+                } else {
+                    //添加图片水印
+                    ImgUtil.pressImage(
+                            FileUtil.file(file.getAbsolutePath()),
+                            FileUtil.file(file.getAbsolutePath()),
+                            ImgUtil.read(FileUtil.file(Constants.Root_PATH + scheduleTask.getImagesPath())), //水印图片
+                            scheduleTask.getX(), //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                            scheduleTask.getY(), //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                            scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
+                    );
+                }
             }
             //生成预览图
             File preFile = new File(Constants.PREVIEW_PATH + UUID.randomUUID() + file.getName());
