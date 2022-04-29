@@ -113,19 +113,7 @@ public class DeviceScheduleServiceImpl extends ServiceImpl<DeviceScheduleMapper,
         cameraInfo.setDeviceId(deviceInfo.getDeviceId());
         cameraInfo.setCreatUser(task.getCreatedUser());
         //抓拍1小时
-        TestHikvision testHikvision = null;
-        if (task.getTaskType() == 0 || task.getTaskType() == 1) {
-            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
-        }
-        if (task.getTaskType() == 2 || task.getTaskType() == 7) {
-            //自定义时间 需指定任务结束日期
-            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
-        }
-        //月满计划与黑夜计划与白天计划
-        if (task.getTaskType() == 3 || task.getTaskType() == 6 || task.getTaskType() == 4) {
-            //自定义时间 需指定任务结束日期
-            testHikvision = new TestHikvision(cameraInfo, task, DateUtil.formatDateTime(new Date(time)), deviceLogService, imageInfoService);
-        }
+        TestHikvision testHikvision = new TestHikvision(cameraInfo, task, time, deviceLogService, imageInfoService);
         String schedule = CronUtil.schedule(scheduleCycle, testHikvision);
         //判断是否到结束日期 结束移除任务
         String date = task.getEndDate();

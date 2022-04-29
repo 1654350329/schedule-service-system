@@ -22,10 +22,10 @@ public class EntityMetaObjectHandler implements MetaObjectHandler {
         if (baseEntity.getDel() == null) {
             this.setFieldValByName("del", 0, metaObject);
         }
-        if (baseEntity.getCreatedUser() == null) {
+        if (baseEntity.getCreatedUser() == null && LoginUserUtil.getUserId() != null) {
             this.setFieldValByName("createdUser", LoginUserUtil.getUserId(), metaObject);
         }
-        if (baseEntity.getUpdatedUser() == null) {
+        if (baseEntity.getUpdatedUser() == null && LoginUserUtil.getUserId() != null) {
             this.setFieldValByName("updatedUser", LoginUserUtil.getUserId(), metaObject);
         }
         if (baseEntity.getUpdatedTime() == null) {
@@ -36,7 +36,7 @@ public class EntityMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         BaseEntity baseEntity = (BaseEntity) metaObject.getOriginalObject();
-        if (baseEntity.getUpdatedUser() == null) {
+        if (baseEntity.getUpdatedUser() == null && LoginUserUtil.getUserId() != null) {
             this.setFieldValByName("updatedUser", LoginUserUtil.getUserId(), metaObject);
         }
         if (baseEntity.getUpdatedTime() == null) {

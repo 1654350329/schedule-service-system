@@ -1,7 +1,10 @@
 package com.tree.clouds.schedule.utils;
 
+
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.tree.clouds.schedule.model.entity.UserManage;
-import com.tree.clouds.schedule.security.JwtAuthenticationFilter;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author 林振坤
@@ -11,30 +14,36 @@ import com.tree.clouds.schedule.security.JwtAuthenticationFilter;
 public class LoginUserUtil {
 
     public static String getUserId() {
-        UserManage userManage = JwtAuthenticationFilter.getLoginUser();
-        if (userManage == null) {
+        try {
+            Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+            if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
+                return null;
+            }
+            UserManage UserManage = (UserManage) credentials;
+            return UserManage.getUserId();
+        } catch (RuntimeException e) {
             return null;
-        } else {
-            return userManage.getUserId();
         }
+
     }
 
+
     public static String getUserName() {
-        UserManage userManage = JwtAuthenticationFilter.getLoginUser();
-        if (userManage == null) {
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
             return null;
-        } else {
-            return userManage.getUserName();
         }
+        UserManage UserManage = (UserManage) credentials;
+        return UserManage.getUserName();
+
     }
 
     public static String getUserAccount() {
-        UserManage userManage = JwtAuthenticationFilter.getLoginUser();
-        if (userManage == null) {
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        if (ObjectUtil.isNull(credentials) || StrUtil.isBlank(credentials.toString())) {
             return null;
-        } else {
-            return userManage.getAccount();
         }
+        UserManage UserManage = (UserManage) credentials;
+        return UserManage.getAccount();
     }
-
 }

@@ -40,8 +40,9 @@ public class TaskSchedule implements Task {
         //日出
         if (scheduleTask.getTaskType() == 0) {
             //执行时间
-            String date = scheduleTask.getStartDate() + " 04:20:00";
+            String date = DateUtil.formatDate(new Date()) + " 04:20:00";
             DateTime parseDate = DateUtil.parseDateTime(date);
+
             if (parseDate.getTime() <= new Date().getTime()) {
                 date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
             }
@@ -54,10 +55,10 @@ public class TaskSchedule implements Task {
         //日落
         if (scheduleTask.getTaskType() == 1) {
             //执行时间
-            String date = scheduleTask.getStartDate() + " 16:28:00";
+            String date = DateUtil.formatDate(new Date()) + " 16:28:00";
             DateTime parseDate = DateUtil.parseDateTime(date);
             if (parseDate.getTime() <= new Date().getTime()) {
-                date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
+                date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 10));
             }
             String[] dates = date.replace(" ", "-").replace(":", "-").split("-");
             String schedulingPattern = String.format("%s %s %s */1 * ? *", dates[5], dates[4], dates[3]);
@@ -69,7 +70,7 @@ public class TaskSchedule implements Task {
         //自定义时间与跨日计划
         if (scheduleTask.getTaskType() == 2 || scheduleTask.getTaskType() == 7) {
             //执行时间
-            String date = scheduleTask.getStartDate() + " " + scheduleTask.getStartTime();
+            String date = DateUtil.formatDate(new Date()) + " " + scheduleTask.getStartTime();
             DateTime parseDate = DateUtil.parseDateTime(date);
             date = DateUtil.formatDateTime(new Date(parseDate.getTime() - 1000 * 30));
             if (parseDate.getTime() <= new Date().getTime()) {
@@ -84,7 +85,7 @@ public class TaskSchedule implements Task {
         //满月计划与黑夜计划
         if (scheduleTask.getTaskType() == 3 || scheduleTask.getTaskType() == 6) {
             //执行时间
-            String date = scheduleTask.getStartDate() + " 16:28:00";
+            String date = DateUtil.formatDate(new Date()) + " 16:28:00";
             DateTime parseDate = DateUtil.parseDateTime(date);
             if (parseDate.getTime() <= new Date().getTime()) {
                 date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));
@@ -98,7 +99,7 @@ public class TaskSchedule implements Task {
         //白天计划
         if (scheduleTask.getTaskType() == 4) {
             //执行时间
-            String date = scheduleTask.getStartDate() + " 04:28:00";
+            String date = DateUtil.formatDate(new Date()) + " 04:28:00";
             DateTime parseDate = DateUtil.parseDateTime(date);
             if (parseDate.getTime() <= new Date().getTime()) {
                 date = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 5));

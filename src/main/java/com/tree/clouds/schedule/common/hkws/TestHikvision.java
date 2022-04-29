@@ -1,6 +1,5 @@
 package com.tree.clouds.schedule.common.hkws;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
@@ -36,12 +35,12 @@ public class TestHikvision implements Task {
     //记录设备状态
     private static final Map<String, Boolean> deviceMap = new ConcurrentHashMap<>();
     private MonitorCameraInfo cameraInfo;
-    private String endTime;
+    private Long endTime;
     private DeviceLogService deviceLogService;
     private ImageInfoService imageInfoService;
     private ScheduleTask scheduleTask;
 
-    public TestHikvision(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, String endTime, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
+    public TestHikvision(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, Long endTime, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
         this.cameraInfo = cameraInfo;
         this.scheduleTask = scheduleTask;
         this.endTime = endTime;
@@ -49,25 +48,12 @@ public class TestHikvision implements Task {
         this.imageInfoService = imageInfoService;
     }
 
-    public void execute() {
-        if (endTime != null) {
-            DateTime parse = DateUtil.parseDateTime(endTime);
-            if (new Date().getTime() > parse.getTime()) {
-                CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
-                Constants.scheduleMap.remove(cameraInfo.getTaskId());
-                return;
-            }
-        }
-        getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);
-
-    }
-
     //抓拍图片
     public static void getDVRPic(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
 
         try {
             long startTime = System.currentTimeMillis();
-            log.info("cameraInfo = " + cameraInfo);
+            log.info("本次执行 = " + scheduleTask.getScheduleName() + "设备号:" + cameraInfo.getDeviceId() + "任务号:" + cameraInfo.getTaskId());
             if (!hcNetSDKMap.containsKey(cameraInfo.getDeviceId())) {
                 HCNetSDK.NET_DVR_DEVICEINFO_V30 devinfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();// 设备信息
                 //注册设备
@@ -80,7 +66,6 @@ public class TestHikvision implements Task {
                     deviceLogService.saveLog(cameraInfo.getDeviceId(), sdk.NET_DVR_GetLastError(), false);
                     return;
                 } else {
-
                     System.out.println("id：" + cameraInfo.getUserId().intValue());
                     hcNetSDKMap.put(cameraInfo.getDeviceId(), id);
                 }
@@ -123,10 +108,10 @@ public class TestHikvision implements Task {
             File file = new File(fileName);
 //             抓图到内存，单帧数据捕获并保存成JPEG存放在指定的内存空间中
 //            需要加入通道
-            String dateTime = DateUtil.formatDateTime(new Date(new Date().getTime() - 1000 * 10));
+            String dateTime = DateUtil.formatDateTime(new Date());
             boolean is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                     jpegBuffer, 1024 * 1024 * 5, byReference);
-            System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]");
+            System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]" + filePath);
             while (!is && (sdk.NET_DVR_GetLastError() == 9 || sdk.NET_DVR_GetLastError() == 10)) {
                 is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                         jpegBuffer, 1024 * 1024 * 5, byReference);
@@ -184,9 +169,8 @@ public class TestHikvision implements Task {
             imageInfo.setDay(split[2]);
             imageInfo.setCreatedTime(dateTime);
             imageInfo.setCreatedUser(cameraInfo.getCreatUser());
+            imageInfo.setUpdatedUser(cameraInfo.getCreatUser());
             imageInfoService.save(imageInfo);
-            log.info("抓取成功,返回长度：" + byReference.getValue());
-            log.info("存储本地耗时：[" + (System.currentTimeMillis() - startTime) + "ms]");
             //第一次启动 记录
             if (!deviceMap.containsKey(cameraInfo.getDeviceId())) {
                 deviceLogService.saveLog(cameraInfo.getDeviceId(), null, true);
@@ -203,7 +187,16 @@ public class TestHikvision implements Task {
         }
     }
 
+    public void execute() {
+        if (endTime != null && new Date().getTime() > endTime) {
+            log.info("本次任务已结束:" + scheduleTask.getScheduleName());
+            CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
+            Constants.scheduleMap.remove(cameraInfo.getTaskId());
+            return;
+        }
+        getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);
 
+    }
 
 
     private static void makeFile(IntByReference byReference, ByteBuffer jpegBuffer, File file) {

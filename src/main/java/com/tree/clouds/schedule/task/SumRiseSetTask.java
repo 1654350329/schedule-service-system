@@ -38,26 +38,34 @@ public class SumRiseSetTask implements Task {
             if (scheduleTask.getTaskType() == 0) {
                 startTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
                 DateTime dateTime = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + startTime);
+                if (new Date().getTime() > new Date(dateTime.getTime() + 1000 * 60 * 60).getTime()) {
+                    log.info(scheduleTask.getScheduleName() + "已过日出时间");
+                    return;
+                }
                 try {
                     String scheduleCycle = String.format("*/%s * * * * ? *", scheduleTask.getFrequency());
                     while (new Date().getTime() < dateTime.getTime()) {
-                        System.out.println(" 等等执行" + deviceInfo);
-                        Thread.currentThread().sleep(1000 * 30);
+                        Thread.sleep(1000 * 30);
                     }
+                    log.info("日出计划开始执行:" + scheduleTask.getScheduleName());
                     deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, dateTime.getTime() + 1000 * 60 * 60);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } else if (scheduleTask.getTaskType() == 1) {
                 startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
-                //日出落前半小时
                 DateTime dateTime = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + startTime);
+                if (new Date().getTime() > new Date(dateTime.getTime() + 1000 * 60 * 60).getTime()) {
+                    log.info(scheduleTask.getScheduleName() + "已过日落时间");
+                    return;
+                }
                 try {
                     String scheduleCycle = String.format("*/%s * * * * ? *", scheduleTask.getFrequency());
                     while (new Date().getTime() < dateTime.getTime()) {
                         System.out.println(" 等等执行" + deviceInfo);
-                        Thread.currentThread().sleep(1000 * 30);
+                        Thread.sleep(1000 * 30);
                     }
+                    log.info("日落计划开始执行:" + scheduleTask.getScheduleName());
                     //结束时间往后一小时
                     deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, dateTime.getTime() + 1000 * 60 * 60);
                 } catch (InterruptedException e) {
@@ -76,13 +84,19 @@ public class SumRiseSetTask implements Task {
                     scheduleCycle = String.format("%s %s */%s * * ? *", split[2], split[1], scheduleTask.getFrequency());
                 }
                 String endTime = (DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime());
-                if (DateUtil.parseTime(scheduleTask.getEndTime()).getTime() < DateUtil.parseTime(scheduleTask.getStartTime()).getTime()) {
+                if (scheduleTask.getTaskType() == 2) {
+                    if (DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime()).getTime() > new Date().getTime()) {
+                        log.info(scheduleTask.getScheduleName() + "已过自定义时间");
+                    }
+                }
+                if (scheduleTask.getTaskType() == 7) {
                     endTime = DateUtil.formatDate(DateUtil.tomorrow()) + " " + scheduleTask.getEndTime();
                 }
                 DateTime dateTime = DateUtil.parseDateTime(endTime);
+                log.info("自定义计划开始执行:" + scheduleTask.getScheduleName());
                 deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, dateTime.getTime());
             }
-            //月满计划
+            //月满计划与黑夜计划
             else if (scheduleTask.getTaskType() == 3 || scheduleTask.getTaskType() == 6) {
                 if (scheduleTask.getTaskType() == 3) {
                     String[] days = {"十二", "十三", "十四", "十五", "十六"};
@@ -90,7 +104,6 @@ public class SumRiseSetTask implements Task {
                     //判断是否是月满
                     ChineseDate chineseDate = new ChineseDate(new Date());
                     if (!list.contains(chineseDate.getChineseDay())) {
-                        System.out.println("chineseDate = " + chineseDate);
                         log.info(scheduleTask.getScheduleName() + "当前不是满月时间");
                         return;
                     }
@@ -111,9 +124,9 @@ public class SumRiseSetTask implements Task {
                     startTime = (DateUtil.formatDate(new Date()) + " " + startTime);
                     DateTime dateTime = DateUtil.parseDateTime(startTime);
                     while (new Date().getTime() < dateTime.getTime()) {
-                        System.out.println(" 等等执行" + deviceInfo);
-                        Thread.currentThread().sleep(1000 * 30);
+                        Thread.sleep(1000 * 30);
                     }
+                    log.info("月满或黑夜计划开始执行:" + scheduleTask.getScheduleName());
                     //获取第二天的日出蓝调时间
                     String endTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), DateUtil.tomorrow());
                     DateTime time = DateUtil.parseDateTime(DateUtil.tomorrow() + " " + endTime);
@@ -121,8 +134,16 @@ public class SumRiseSetTask implements Task {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } else if (scheduleTask.getTaskType() == 4) {
+            } //白天计划
+            else if (scheduleTask.getTaskType() == 4) {
                 startTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                //获取日落蓝调时间
+                String endTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                DateTime time = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + endTime);
+                if (time.getTime() < new Date().getTime()) {
+                    log.info(scheduleTask.getScheduleName() + ":已过白天时间");
+                    return;
+                }
                 String[] split = startTime.split(":");
                 String scheduleCycle = null;
                 try {
@@ -138,12 +159,9 @@ public class SumRiseSetTask implements Task {
                     startTime = (DateUtil.formatDate(new Date()) + " " + startTime);
                     DateTime dateTime = DateUtil.parseDateTime(startTime);
                     while (new Date().getTime() < dateTime.getTime()) {
-                        System.out.println(" 等等执行" + deviceInfo);
-                        Thread.currentThread().sleep(1000 * 30);
+                        Thread.sleep(1000 * 30);
                     }
-                    //获取第二天的日出蓝调时间
-                    String endTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
-                    DateTime time = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + endTime);
+                    log.info("白天计划开始执行:" + scheduleTask.getScheduleName());
                     deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, time.getTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();

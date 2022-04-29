@@ -10,7 +10,7 @@ import java.util.List;
 
 public class SunRiseSet {
 
-    //    private final static double h = -0.833;//日出日落时太阳的位置
+//        private final static double h = -0.833;//日出日落时太阳的位置
     private final static double h = -9.167;//日出日落时太阳的位置 蓝调时间 -3 -6
     private final static double UTo = 180.0;//上次计算的日落日出时间，初始迭代值180.0
     private static int[] days_of_month_1 = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};

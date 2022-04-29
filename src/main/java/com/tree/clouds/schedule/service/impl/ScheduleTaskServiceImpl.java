@@ -24,12 +24,14 @@ import com.tree.clouds.schedule.task.TaskSchedule;
 import com.tree.clouds.schedule.utils.BaseBusinessException;
 import com.tree.clouds.schedule.utils.LoginUserUtil;
 import com.tree.clouds.schedule.utils.MultipartFileUtil;
+import com.tree.clouds.schedule.utils.SunRiseSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -74,7 +76,26 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             if (record.getTaskType() == 2) {
                 record.setTime(record.getStartTime() + " 至 " + record.getEndTime());
             }
-
+            //设置运行时间
+            String sunrise = SunRiseSet.getSunrise(new BigDecimal("119.223983"), new BigDecimal("27.413"), new Date());
+            String sunset = SunRiseSet.getSunset(new BigDecimal("119.223983"), new BigDecimal("27.413"), new Date());
+            //日出计划
+            if (record.getTaskType() == 0) {
+                record.setTime(sunrise + " 至 " + DateUtil.formatTime(new Date(DateUtil.parseTime(sunrise).getTime() + 1000 * 60 * 60)));
+            }
+            //日落计划
+            if (record.getTaskType() == 1) {
+                record.setTime(sunset + " 至 " + DateUtil.formatTime(new Date(DateUtil.parseTime(sunset).getTime() + 1000 * 60 * 60)));
+            }
+            //满月计划黑夜计划
+            if (record.getTaskType() == 3 || record.getTaskType() == 6) {
+                sunrise = SunRiseSet.getSunrise(new BigDecimal("119"), new BigDecimal("27.413"), DateUtil.tomorrow());
+                record.setTime(sunset + " 至 " + sunrise);
+            }
+            //白天计划
+            if (record.getTaskType() == 4) {
+                record.setTime(sunrise + " 至 " + sunset);
+            }
             record.setDate(record.getStartDate() + " 至 " + record.getEndDate());
             int size = deviceScheduleService.getByScheduleId(record.getScheduleId()).size();
             record.setDeviceNumber(size);
@@ -89,7 +110,8 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
         if (task.getScheduleStatus() != null && task.getScheduleStatus() == 1) {
             throw new BaseBusinessException(400, "任务已开启,请先停止任务!");
         }
-        ScheduleTask one = this.getOne(new QueryWrapper<ScheduleTask>().eq(ScheduleTask.SCHEDULE_NAME, scheduleTaskVO.getScheduleName()));
+        ScheduleTask one = this.getOne(new QueryWrapper<ScheduleTask>().eq(ScheduleTask.SCHEDULE_NAME, scheduleTaskVO.getScheduleName())
+                .ne(ScheduleTask.SCHEDULE_ID, scheduleTaskVO.getScheduleId()));
         if (one != null) {
             throw new BaseBusinessException(400, "计划任务名称已存在");
         }
