@@ -1,5 +1,6 @@
 package com.tree.clouds.schedule.common.hkws;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
@@ -13,6 +14,7 @@ import com.tree.clouds.schedule.model.entity.ImageInfo;
 import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.service.DeviceLogService;
 import com.tree.clouds.schedule.service.ImageInfoService;
+import com.tree.clouds.schedule.service.ScheduleTaskService;
 import com.tree.clouds.schedule.utils.ImgInfoUtil;
 import com.tree.clouds.schedule.utils.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +43,15 @@ public class TestHikvision implements Task {
     private DeviceLogService deviceLogService;
     private ImageInfoService imageInfoService;
     private ScheduleTask scheduleTask;
+    private ScheduleTaskService scheduleTaskService;
 
-    public TestHikvision(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, Long endTime, DeviceLogService deviceLogService, ImageInfoService imageInfoService) {
+    public TestHikvision(MonitorCameraInfo cameraInfo, ScheduleTask scheduleTask, Long endTime, DeviceLogService deviceLogService, ImageInfoService imageInfoService, ScheduleTaskService scheduleTaskService) {
         this.cameraInfo = cameraInfo;
         this.scheduleTask = scheduleTask;
         this.endTime = endTime;
         this.deviceLogService = deviceLogService;
         this.imageInfoService = imageInfoService;
+        this.scheduleTaskService = scheduleTaskService;
     }
 
     //抓拍图片
@@ -114,7 +118,7 @@ public class TestHikvision implements Task {
             if (SystemUtil.getSystemByName().equalsIgnoreCase("Linux")) {
                 dateTime = DateUtil.formatDateTime(new Date());
             } else {
-                dateTime = DateUtil.formatDateTime(new Date(new Date().getTime() + 1000 * 10));
+                dateTime = DateUtil.formatDateTime(new Date(new Date().getTime() - 1000 * 10));
             }
             boolean is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                     jpegBuffer, 1024 * 1024 * 5, byReference);
@@ -206,9 +210,19 @@ public class TestHikvision implements Task {
 
     public void execute() {
         if (endTime != null && new Date().getTime() > endTime) {
-            log.info("本次任务已结束:" + scheduleTask.getScheduleName());
+            log.info("本次任务已结束:" + scheduleTask.getScheduleName() + "_任务号:" + cameraInfo.getTaskId());
             CronUtil.remove(Constants.scheduleMap.get(cameraInfo.getTaskId()));
             Constants.scheduleMap.remove(cameraInfo.getTaskId());
+            //判断是否到结束日期 结束移除任务
+            String date = scheduleTask.getEndDate();
+            DateTime parse = DateUtil.parseDate(date);
+            if (new Date().getTime() > parse.getTime()) {
+                //执行状态为关闭
+                scheduleTask.setScheduleStatus(0);
+                scheduleTaskService.updateById(scheduleTask);
+                CronUtil.remove(scheduleTask.getScheduleNumber());
+                log.info("任务执行日期结束:" + scheduleTask.getScheduleName() + "_任务号:" + cameraInfo.getTaskId());
+            }
             return;
         }
         getDVRPic(cameraInfo, scheduleTask, deviceLogService, imageInfoService);

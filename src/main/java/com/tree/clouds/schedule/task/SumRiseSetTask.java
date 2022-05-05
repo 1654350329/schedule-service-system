@@ -85,8 +85,9 @@ public class SumRiseSetTask implements Task {
                 }
                 String endTime = (DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime());
                 if (scheduleTask.getTaskType() == 2) {
-                    if (DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime()).getTime() > new Date().getTime()) {
+                    if (new Date().getTime() > DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + scheduleTask.getEndTime()).getTime()) {
                         log.info(scheduleTask.getScheduleName() + "已过自定义时间");
+                        return;
                     }
                 }
                 if (scheduleTask.getTaskType() == 7) {
@@ -129,7 +130,7 @@ public class SumRiseSetTask implements Task {
                     log.info("月满或黑夜计划开始执行:" + scheduleTask.getScheduleName());
                     //获取第二天的日出蓝调时间
                     String endTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), DateUtil.tomorrow());
-                    DateTime time = DateUtil.parseDateTime(DateUtil.tomorrow() + " " + endTime);
+                    DateTime time = DateUtil.parseDateTime(DateUtil.formatDate(DateUtil.tomorrow()) + " " + endTime);
                     deviceScheduleService.captureTask(deviceSchedule, scheduleTask.getCodeRate(), scheduleCycle, 0, time.getTime());
                 } catch (InterruptedException e) {
                     e.printStackTrace();

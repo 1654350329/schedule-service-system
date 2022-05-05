@@ -154,7 +154,8 @@ public class Move extends Base implements Task {
         albumRecord.setPreviewImage(previewImage.replace(Constants.Root_PATH, ""));
         File file = new File(outPutPath);
         albumRecord.setFileSize(file.length() / 1024);//以k为单位
-        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(scheduleTask.getFps()));
+        int fps = (scheduleTask.getFps() == null ? 24 : scheduleTask.getFps());
+        double time = FileUtil.ls(sourcePath).length / Double.parseDouble(String.valueOf(fps));
         albumRecord.setDuration(time + "");
         albumRecordService.save(albumRecord);
         FileUtil.del(files);
