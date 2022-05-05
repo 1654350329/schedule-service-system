@@ -78,13 +78,14 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
             }
             //设置运行时间
             String sunrise = SunRiseSet.getSunrise(new BigDecimal("119.223983"), new BigDecimal("27.413"), new Date());
-            String sunset = SunRiseSet.getSunset(new BigDecimal("119.223983"), new BigDecimal("27.413"), new Date());
+            String sunset = SunRiseSet.getSunset(new BigDecimal("119.223983"), new BigDecimal("27.413"), new Date(), SunRiseSet.dark);
             //日出计划
             if (record.getTaskType() == 0) {
                 record.setTime(sunrise + " 至 " + DateUtil.formatTime(new Date(DateUtil.parseTime(sunrise).getTime() + 1000 * 60 * 60)));
             }
             //日落计划
             if (record.getTaskType() == 1) {
+                sunset = SunRiseSet.getSunset(new BigDecimal("119.223983"), new BigDecimal("27.413"), new Date(), SunRiseSet.sunset);
                 record.setTime(sunset + " 至 " + DateUtil.formatTime(new Date(DateUtil.parseTime(sunset).getTime() + 1000 * 60 * 60)));
             }
             //满月计划黑夜计划

@@ -53,7 +53,7 @@ public class SumRiseSetTask implements Task {
                     e.printStackTrace();
                 }
             } else if (scheduleTask.getTaskType() == 1) {
-                startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date(), SunRiseSet.sunset);
                 DateTime dateTime = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + startTime);
                 if (new Date().getTime() > new Date(dateTime.getTime() + 1000 * 60 * 60).getTime()) {
                     log.info(scheduleTask.getScheduleName() + "已过日落时间");
@@ -109,7 +109,7 @@ public class SumRiseSetTask implements Task {
                         return;
                     }
                 }
-                startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                startTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date(), SunRiseSet.dark);
                 String[] split = startTime.split(":");
                 String scheduleCycle = null;
                 try {
@@ -139,7 +139,7 @@ public class SumRiseSetTask implements Task {
             else if (scheduleTask.getTaskType() == 4) {
                 startTime = SunRiseSet.getSunrise(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
                 //获取日落蓝调时间
-                String endTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date());
+                String endTime = SunRiseSet.getSunset(new BigDecimal(deviceInfo.getLng()), new BigDecimal(deviceInfo.getLat()), new Date(), SunRiseSet.dark);
                 DateTime time = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + endTime);
                 if (time.getTime() < new Date().getTime()) {
                     log.info(scheduleTask.getScheduleName() + ":已过白天时间");

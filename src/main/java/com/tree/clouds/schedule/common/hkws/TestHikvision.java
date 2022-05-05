@@ -168,8 +168,8 @@ public class TestHikvision implements Task {
                             FileUtil.file(file.getAbsolutePath()),
                             FileUtil.file(file.getAbsolutePath()),
                             ImgUtil.read(FileUtil.file(Constants.Root_PATH + scheduleTask.getImagesPath())), //水印图片
-                            scheduleTask.getX(), //x坐标修正值。 默认在中间，偏移量相对于中间偏移
-                            scheduleTask.getY(), //y坐标修正值。 默认在中间，偏移量相对于中间偏移
+                            x, //x坐标修正值。 默认在中间，偏移量相对于中间偏移
+                            y, //y坐标修正值。 默认在中间，偏移量相对于中间偏移
                             scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
                     );
                 }

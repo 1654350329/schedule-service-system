@@ -10,11 +10,13 @@ import java.util.List;
 
 public class SunRiseSet {
 
-//        private final static double h = -0.833;//日出日落时太阳的位置
-    private final static double h = -9.167;//日出日落时太阳的位置 蓝调时间 -3 -6
+    public final static double dark = -9.167;
     private final static double UTo = 180.0;//上次计算的日落日出时间，初始迭代值180.0
     private static int[] days_of_month_1 = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     private static int[] days_of_month_2 = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    public final static double sunset = -0.833;
+    //        private final static double h = -0.833;//日出日落时太阳的位置
+    private static double h = -9.167;//日出日落时太阳的位置 蓝调时间 -3 -6
 
     //输入日期
 
@@ -189,7 +191,7 @@ public class SunRiseSet {
 
 //判断并返回结果（日落）
 
-    public static double result_set(double UT, double UTo, double glong, double glat, int year, int month, int date) {
+    public static double result_set(double UT, double UTo, double glong, double glat, int year, int month, int date, double hg) {
 
         double d;
 
@@ -211,13 +213,13 @@ public class SunRiseSet {
 
                     glong,
 
-                    e(h, glat, sun_deviation(earth_tilt(t_century(days(year, month, date), UTo)),
+                    e(hg, glat, sun_deviation(earth_tilt(t_century(days(year, month, date), UTo)),
 
                             ecliptic_longitude(L_sun(t_century(days(year, month, date), UTo)),
 
                                     G_sun(t_century(days(year, month, date), UTo))))));
 
-            result_set(UT, UTo, glong, glat, year, month, date);
+            result_set(UT, UTo, glong, glat, year, month, date, hg);
 
         }
 
@@ -272,20 +274,13 @@ public class SunRiseSet {
                             ecliptic_longitude(L_sun(t_century(days(year, month, date), UTo)),
 
                                     G_sun(t_century(days(year, month, date), UTo)))))), UTo, glong, glat, year, month, date);
-
-//System.out.println("Sunrise is: "+(int)(sunrise/15+Zone(glong))+":"+(int)(60*(sunrise/15+Zone(glong)-(int)(sunrise/15+Zone(glong))))+" .\n");
-
-//        Log.d("Sunrise", "Sunrise is: "+(int)(sunrise/15+8)+":"+(int)(60*(sunrise/15+8-(int)(sunrise/15+8)))+" .\n");
-
-            //return "Sunrise is: "+(int)(sunrise/15+Zone(glong))+":"+(int)(60*(sunrise/15+Zone(glong)-(int)(sunrise/15+Zone(glong))))+" .\n";
-
             return (int) (sunrise / 15 + 8) + ":" + (int) (60 * (sunrise / 15 + 8 - (int) (sunrise / 15 + 8))) + ":00";
         }
         return null;
     }
 
 
-    public static String getSunset(BigDecimal longitude, BigDecimal latitude, Date sunTime) {
+    public static String getSunset(BigDecimal longitude, BigDecimal latitude, Date sunTime, double hg) {
         if (sunTime != null && latitude != null && longitude != null) {
             double sunset, glong, glat;
             int year, month, date;
@@ -317,11 +312,11 @@ public class SunRiseSet {
 
                     glong,
 
-                    e(h, glat, sun_deviation(earth_tilt(t_century(days(year, month, date), UTo)),
+                    e(hg, glat, sun_deviation(earth_tilt(t_century(days(year, month, date), UTo)),
 
                             ecliptic_longitude(L_sun(t_century(days(year, month, date), UTo)),
 
-                                    G_sun(t_century(days(year, month, date), UTo)))))), UTo, glong, glat, year, month, date);
+                                    G_sun(t_century(days(year, month, date), UTo)))))), UTo, glong, glat, year, month, date, hg);
 
 
             return (int) (sunset / 15 + 8) + ":" + (int) (60 * (sunset / 15 + 8 - (int) (sunset / 15 + 8))) + ":00";
@@ -331,7 +326,7 @@ public class SunRiseSet {
 
     public static void main(String[] args) {
         String str1 = SunRiseSet.getSunrise(new BigDecimal("118.916794"), new BigDecimal("27.134285"), new Date());
-        String str2 = SunRiseSet.getSunset(new BigDecimal("118.916794"), new BigDecimal("27.134285"), new Date());
+        String str2 = SunRiseSet.getSunset(new BigDecimal("118.916794"), new BigDecimal("27.134285"), new Date(), -9.167);
         System.out.println("日出时间：" + str1);
         System.out.println("日落时间：" + str2);
         ChineseDate chineseDate = new ChineseDate(new Date());

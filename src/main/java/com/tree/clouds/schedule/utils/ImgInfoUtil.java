@@ -1,8 +1,5 @@
 package com.tree.clouds.schedule.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,9 +14,6 @@ import java.util.Map;
  * REMARK 图片处理类 压缩图片大小
  */
 public class ImgInfoUtil {
-
-
-    static Logger logger = LoggerFactory.getLogger(ImgInfoUtil.class);
 
     /**
      * 左上角
