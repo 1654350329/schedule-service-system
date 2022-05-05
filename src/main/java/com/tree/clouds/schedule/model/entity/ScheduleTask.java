@@ -31,6 +31,7 @@ public class ScheduleTask extends BaseEntity {
     public static final String FREQUENCY = "frequency";
     public static final String CODE_RATE = "code_rate";
     public static final String SCHEDULE_STATUS = "schedule_status";
+    public static final String TASK_TYPE = "task_type";
     public static final Integer STATUS_TRUE = 1;
     public static final Integer STATUS_FALSE = 0;
 

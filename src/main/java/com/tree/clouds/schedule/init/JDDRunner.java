@@ -2,6 +2,7 @@ package com.tree.clouds.schedule.init;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.cron.CronUtil;
+import cn.hutool.cron.task.Task;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tree.clouds.schedule.common.Constants;
 import com.tree.clouds.schedule.common.hkws.HCNetSDK;
@@ -14,6 +15,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -61,6 +63,40 @@ public class JDDRunner implements ApplicationRunner {
             scheduleTaskService.startSchedule(scheduleTask.getScheduleId());
             System.out.println("开启定时任务计划");
         }
+        CronUtil.schedule("0 0 0 */1 * ? *", new Task() {
+            @Override
+            public void execute() {
+                List<Integer> integerList = new ArrayList<>();
+                integerList.add(0);//日出
+                integerList.add(1);//日落
+                integerList.add(2);//自定义
+                integerList.add(4);//白天计划
+                List<ScheduleTask> list = scheduleTaskService.list(new QueryWrapper<ScheduleTask>()
+                        .eq(ScheduleTask.SCHEDULE_STATUS, ScheduleTask.STATUS_TRUE)
+                        .in(ScheduleTask.TASK_TYPE, integerList));
+                for (ScheduleTask scheduleTask : list) {
+                    scheduleTaskService.startSchedule(scheduleTask.getScheduleId());
+                    log.info("开启白天执行的任务计划");
+                }
+            }
+        });
+        CronUtil.schedule("0 0 12 */1 * ? *", new Task() {
+            @Override
+            public void execute() {
+                List<Integer> integerList = new ArrayList<>();
+                integerList.add(3);//满月计划
+                integerList.add(6);//黑夜
+                integerList.add(7);//自定义跨夜
+                List<ScheduleTask> list = scheduleTaskService.list(new QueryWrapper<ScheduleTask>()
+                        .eq(ScheduleTask.SCHEDULE_STATUS, ScheduleTask.STATUS_TRUE)
+                        .in(ScheduleTask.TASK_TYPE, integerList));
+                for (ScheduleTask scheduleTask : list) {
+                    scheduleTaskService.startSchedule(scheduleTask.getScheduleId());
+                    log.info("开启黑夜执行的任务计划");
+                }
+            }
+        });
+
         //添加设备失败字典
         buildErrorMap();
         //创建文件夹

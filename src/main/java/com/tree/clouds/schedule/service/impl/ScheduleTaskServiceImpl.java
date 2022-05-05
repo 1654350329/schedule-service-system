@@ -179,7 +179,21 @@ public class ScheduleTaskServiceImpl extends ServiceImpl<ScheduleTaskMapper, Sch
 
     @Override
     public void startSchedule(String scheduleId) {
+        List<DeviceSchedule> deviceSchedules = deviceScheduleService.getByScheduleId(scheduleId);
+        if (CollUtil.isEmpty(deviceSchedules)) {
+            throw new BaseBusinessException(400, "请先添加设备!");
+        }
         ScheduleTask scheduleTask = this.getById(scheduleId);
+        if (scheduleTask.getScheduleStatus() != 0) {
+            this.stopSchedule(scheduleId);
+        }
+        String dateTime = scheduleTask.getEndDate() + " 23:59:59";
+        if (new Date().getTime() > DateUtil.parseDateTime(dateTime).getTime()) {
+            throw new BaseBusinessException(400, "执行任务时间已结束!请重新编辑");
+        }
+        scheduleTask.setScheduleStatus(1);
+        this.updateById(scheduleTask);
+
         String date = scheduleTask.getStartDate() + " 00:00:00";
         DateTime parseDate = DateUtil.parseDateTime(date);
         if (parseDate.getTime() <= new Date().getTime()) {

@@ -1,18 +1,14 @@
 package com.tree.clouds.schedule.controller;
 
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tree.clouds.schedule.common.RestResponse;
 import com.tree.clouds.schedule.common.aop.Log;
 import com.tree.clouds.schedule.model.bo.ScheduleTaskBO;
-import com.tree.clouds.schedule.model.entity.DeviceSchedule;
-import com.tree.clouds.schedule.model.entity.ScheduleTask;
 import com.tree.clouds.schedule.model.vo.*;
 import com.tree.clouds.schedule.service.DeviceScheduleService;
 import com.tree.clouds.schedule.service.ScheduleTaskService;
-import com.tree.clouds.schedule.utils.BaseBusinessException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -118,20 +113,6 @@ public class ScheduleTaskController {
     @PreAuthorize("hasAuthority('login:log:list')")
     public RestResponse<Boolean> startSchedule(@RequestBody PublicIdsReqVO publicIdsReqVO) {
         for (String id : publicIdsReqVO.getIds()) {
-            List<DeviceSchedule> deviceSchedules = deviceScheduleService.getByScheduleId(id);
-            if (CollUtil.isEmpty(deviceSchedules)) {
-                throw new BaseBusinessException(400, "请先添加设备!");
-            }
-            ScheduleTask scheduleTask = this.scheduleTaskService.getById(id);
-            if (scheduleTask.getScheduleStatus() == 1) {
-                scheduleTaskService.stopSchedule(id);
-            }
-            String dateTime = scheduleTask.getEndDate() + " 23:59:59";
-            if (new Date().getTime() > DateUtil.parseDateTime(dateTime).getTime()) {
-                throw new BaseBusinessException(400, "执行任务时间已结束!请重新编辑");
-            }
-            scheduleTask.setScheduleStatus(1);
-            scheduleTaskService.updateById(scheduleTask);
             scheduleTaskService.startSchedule(id);
         }
         return RestResponse.ok(true);

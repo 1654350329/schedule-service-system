@@ -348,7 +348,9 @@ public class Move extends Base implements Task {
             doWaitFor(p);
             p.destroy();
         } catch (Exception e) {
-            p.destroy();
+            if (p != null) {
+                p.destroy();
+            }
         }
     }
 
