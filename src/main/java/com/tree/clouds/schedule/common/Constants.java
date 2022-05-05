@@ -15,7 +15,7 @@ public class Constants {
     public static final Map<Integer, String> errorMap = new LinkedHashMap<>();
     public static String Root_PATH = "E:\\schedule";
     public static String TMP_HOME = System.getProperty("java.io.tmpdir");
-    ;
+
     //抓拍图片存放路径
     public static String SCHEDULE_PATH = Root_PATH + "\\image\\";
     public static String MP4_PATH = Root_PATH + "\\MP4\\";

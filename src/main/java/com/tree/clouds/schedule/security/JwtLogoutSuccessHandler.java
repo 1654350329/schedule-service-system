@@ -2,9 +2,7 @@ package com.tree.clouds.schedule.security;
 
 import cn.hutool.json.JSONUtil;
 import com.tree.clouds.schedule.common.RestResponse;
-import com.tree.clouds.schedule.service.LoginLogService;
 import com.tree.clouds.schedule.utils.JwtUtils;
-import com.tree.clouds.schedule.utils.LoginUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -22,8 +20,7 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Autowired
     private JwtUtils jwtUtils;
-    @Autowired
-    private LoginLogService loginLogService;
+
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -31,7 +28,6 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
         if (authentication != null) {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
-        loginLogService.updateLongTime(LoginUserUtil.getUserAccount());
         response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream outputStream = response.getOutputStream();
 

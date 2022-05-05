@@ -190,7 +190,7 @@ public class Move extends Base implements Task {
         System.out.println((endTime - startTime));
     }
 
-    public static synchronized void executeCmd(String sourcePath, Integer fps, String outPath, String musicPath) {
+    public static void executeCmd(String sourcePath, Integer fps, String outPath, String musicPath) {
         System.out.println("开始执行生成视频" + outPath);
         long startTime = System.currentTimeMillis();
         if (fps == null || fps == 0) {
@@ -200,6 +200,9 @@ public class Move extends Base implements Task {
         List<String> list = new ArrayList<>();
         list.add(Constants.ffmpeg_path);
         list.add("-i");
+        //-threads 2 以两个线程进行运行， 加快处理的速度。
+        list.add("-threads");
+        list.add("3");
         list.add(sourcePath + "%d.jpg");
         list.add("-stream_loop");
         list.add("-1");

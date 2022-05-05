@@ -33,7 +33,7 @@
         <where>
             a.task_id=#{taskId}
         </where>
-        order by a.year,a.month,a.day desc
+        order by a.year desc,a.month desc,a.day desc
     </select>
     <select id="getDateYear" resultType="java.lang.String">
         select DISTINCT year from image_info

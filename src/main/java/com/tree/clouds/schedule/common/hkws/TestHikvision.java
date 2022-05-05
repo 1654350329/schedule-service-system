@@ -122,7 +122,7 @@ public class TestHikvision implements Task {
             }
             boolean is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                     jpegBuffer, 1024 * 1024 * 5, byReference);
-            System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]" + filePath);
+            System.out.println("抓图到内存耗时：[" + (System.currentTimeMillis() - startTime) + "ms]" + fileName);
             while (!is && (sdk.NET_DVR_GetLastError() == 9 || sdk.NET_DVR_GetLastError() == 10)) {
                 is = sdk.NET_DVR_CaptureJPEGPicture_NEW(cameraInfo.getUserId(), cameraInfo.getChannel(), jpeg,
                         jpegBuffer, 1024 * 1024 * 5, byReference);
@@ -163,6 +163,9 @@ public class TestHikvision implements Task {
                             scheduleTask.getAlpha()//透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
                     );
                 } else {
+                    if (!FileUtil.exist(Constants.Root_PATH + scheduleTask.getImagesPath())) {
+                        return;
+                    }
                     //添加图片水印
                     ImgUtil.pressImage(
                             FileUtil.file(file.getAbsolutePath()),

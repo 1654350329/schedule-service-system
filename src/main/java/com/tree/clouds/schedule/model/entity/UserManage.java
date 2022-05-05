@@ -83,7 +83,7 @@ public class UserManage extends BaseEntity {
     @ApiModelProperty(value = "账号状态 1可用 0不可用")
     @NotNull(message = "账号状态不能为空")
     @TableField(ACCOUNT_STATUS)
-    private int accountStatus;
+    private Integer accountStatus;
 
     @ExcelProperty("备注")
     @ApiModelProperty(value = "备注")

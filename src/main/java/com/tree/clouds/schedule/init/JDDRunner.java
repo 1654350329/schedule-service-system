@@ -76,7 +76,7 @@ public class JDDRunner implements ApplicationRunner {
                         .in(ScheduleTask.TASK_TYPE, integerList));
                 for (ScheduleTask scheduleTask : list) {
                     scheduleTaskService.startSchedule(scheduleTask.getScheduleId());
-                    log.info("开启白天执行的任务计划");
+                    log.info("刷新白天执行的任务计划");
                 }
             }
         });
@@ -92,7 +92,7 @@ public class JDDRunner implements ApplicationRunner {
                         .in(ScheduleTask.TASK_TYPE, integerList));
                 for (ScheduleTask scheduleTask : list) {
                     scheduleTaskService.startSchedule(scheduleTask.getScheduleId());
-                    log.info("开启黑夜执行的任务计划");
+                    log.info("刷新黑夜执行的任务计划");
                 }
             }
         });
