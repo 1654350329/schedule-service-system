@@ -33,6 +33,7 @@
         <where>
             a.task_id=#{taskId}
         </where>
+        order by a.year desc,a.month desc,a.day desc
     </select>
     <select id="getDateYear" resultType="java.lang.String">
         select DISTINCT year from image_info
@@ -67,6 +68,9 @@
             </if>
         </where>
         order by created_Time
+    </select>
+    <select id="getFilePath" resultType="java.lang.String">
+        SELECT file_path FROM `image_info` where created_time >=#{startTime} and created_time  &lt;=#{endTime} ORDER BY created_time asc
     </select>
 
 </mapper>

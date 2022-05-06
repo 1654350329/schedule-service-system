@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/operation-log/exportOperationLog/**",
             "/login-log/exportLoginLog/**",
             "/image/**",
-            "/file/video/**",
+            "/file/**/**",
             "/websocket/**"
 
 

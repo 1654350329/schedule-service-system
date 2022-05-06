@@ -200,10 +200,10 @@ public class Move extends Base implements Task {
         List<String> list = new ArrayList<>();
         list.add(Constants.ffmpeg_path);
         list.add("-i");
+        list.add(sourcePath + "%d.jpg");
         //-threads 2 以两个线程进行运行， 加快处理的速度。
         list.add("-threads");
         list.add("3");
-        list.add(sourcePath + "%d.jpg");
         list.add("-stream_loop");
         list.add("-1");
         list.add("-i");
